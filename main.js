@@ -21,7 +21,8 @@ var time;
 //wenn sich jemand einloggt wird die Website  geliefert
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/public/index.html');    
-    log("User connected.");
+    log(os.userInfo().username + " connected.");
+    console.log(os.userInfo());
 });
 
 
@@ -31,19 +32,20 @@ io.on('connection', function (socket) {
     //wenn eine nachricht übermittelt wird
     socket.on('go', function (e) {
    //wenn debug an ist wird alles per telegram gesendet
-          if(e.debug == true){   
-              log("debug mode von " + e.debugID + " gestartet");
+        if(e.debug == true){   
+            log("debug mode von " + e.debugID + " gestartet");
             bot.sendMessage(e.debugID, actual_time() + "\nESP: " + e.id + "\n" + "Color: R: " + e.color.r + ", G: " + e.color.g + ", B: " + e.color.b + "\n" + "Mode: "  + e.mode);        
-          }
+        }
         
     //!TODO! geloggt und an esp übermittelt wird immer hier
-               
+        log(e.debugID, actual_time() + "\nESP: " + e.id + "\n" + "Color: R: " + e.color.r + ", G: " + e.color.g + ", B: " + e.color.b + "\n" + "Mode: "  + e.mode);               
+        
     });
 
 });
 
 //node listend auf den port
-http.listen(61345, function () {
+http.listen(62345, function () {
     log('start listening on *:62345');
 }); 
 
