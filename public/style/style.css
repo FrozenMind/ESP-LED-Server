@@ -1,0 +1,26 @@
+html 
+{
+    margin: auto;
+    width: 80%;
+    height: 100%;
+}
+body 
+{
+    text-align: center;
+}
+div 
+{
+    margin-bottom: 20px;
+}
+
+b
+{
+    color: coral;
+    margin-bottom: 10px;
+}
+
+footer
+{
+    bottom: 0;
+    width: 100%;
+}

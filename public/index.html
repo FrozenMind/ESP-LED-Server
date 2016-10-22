@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html lang="de">
+    <head>
+        <meta charset="utf-8">
+        <title>Lichterkettensteuerung</title>
+        <link rel="stylesheet" href="style/style.css">
+        <script src="lib/jquery-3.1.1.min.js"></script>
+        <script src="/node_modules/socket.io-client/socket.io.js"></script>
+    </head>
+    <body>
+        <h2> Steuerung für die Lichterketten </h2>
+        <form>
+            1. Schritt:
+            <div id="esp">
+                <b>Auswahl ESP</b> <br>
+                <select name="esps" size="3" title="Auswahl ESP">
+                    <option value="0">0: Vitrine</option>
+                    <option value="1">1: Schreibtische</option>
+                    <option value="2">2: Flur</option>
+                </select>
+            </div>
+            2.Schritt:
+            <div id="color">
+                <b>Farbe wählen</b> <br>
+                <input id="inputColor" type="color" title="Farbe wählen">
+            </div>
+            3.Schritt:
+            <div id="mode">
+                <b>Optional Modus wählen </b><br>
+                <select name="stripMode" size="3" title="Modus wählen">
+                    <option value="0">0: Blinken</option>
+                    <option value="1">1: Fade</option>
+                    <option value="2">2: Rainbow</option>
+                </select>
+            </div>
+            4.Schritt
+            <div id="submit">
+                <b>Absenden</b><br>
+                <button type="button" id="submit" title="Go">Go</button> <br>
+                <input type="checkbox" id="debugMode" title="Debug"> Debug<br>
+                <select name="debug" title="An wen sollen die Debuginformationen gesendet werden?">
+                <!-- Optionen und Größe wird per jQuery ergänzt -->
+            </select>
+            </div>
+        </form>
+    </body>
+    <footer>
+        © Valentin Rebscher &#124; Christian Bechtluft
+    </footer>
+</html>
