@@ -11,43 +11,59 @@ var bot = new TelegramBot(token, {polling: true});
 var valiID = 240395214;
 var chrisID = 196173672;
 
+//log file
+var fs = require('fs');
+var log_file = fs.createWriteStream(__dirname + '/public/log/debug.log', {flags : 'a'});
+
 //sonstige variablen
 var time;
 
-//wenn sich jemand einloggt Datei zurück senden
+//wenn sich jemand einloggt wird die Website  geliefert
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/public/index.html');
-    console.log(actual_time() + "User connected.");
+    res.sendFile(__dirname + '/public/index.html');    
+    log("User connected.");
 });
 
-bot.on('message', function (msg) {
 
-});
-
+//wenn sich ein user einloggt
 io.on('connection', function (socket) {
-    console.log("user connected");
+    
+    //wenn eine nachricht übermittelt wird
     socket.on('go', function (e) {
-        console.log("ESP: " + e.esp);
-        console.log("Color: R: " + e.color.r + ", G: " + e.color.g + ", B: " + e.color.b);
-        console.log("Mode: "  + e.mode);
+   //wenn debug an ist wird alles per telegram gesendet
+          if(e.debug == true){   
+              log("debug mode von " + e.debugID + " gestartet");
+            bot.sendMessage(e.debugID, actual_time() + "\nESP: " + e.id + "\n" + "Color: R: " + e.color.r + ", G: " + e.color.g + ", B: " + e.color.b + "\n" + "Mode: "  + e.mode);        
+          }
         
-        if(e.debug == true){
-        bot.sendMessage(valiID, "ESP: " + e.esp + "\n" + "Color: R: " + e.color.r + ", G: " + e.color.g + ", B: " + e.color.b + "\n" + "Mode: "  + e.mode);
-        bot.sendMessage(chrisID, "ESP: " + e.esp + "\n" + "Color: R: " + e.color.r + ", G: " + e.color.g + ", B: " + e.color.b + "\n" + "Mode: "  + e.mode);
-        }
-        
-      
+    //!TODO! geloggt und an esp übermittelt wird immer hier
+               
     });
 
 });
 
-http.listen(62345, function () {
-    console.log('listening on *:62345');
+//node listend auf den port
+http.listen(61345, function () {
+    log('start listening on *:62345');
 }); 
+
+
+//passiert wenn man per telegram was schreibt
+bot.on('message', function (msg) {
+
+});
+
+
+//console.log methode überschreiben, dass er alles in einer datei speichert
+var log = function(d) {
+    log_file.open();
+    log_file.write(actual_time() + "" + d + "\r\n");       
+    log_file.close();
+};
 
 
 //gibt die aktuelle Zeit zurück
 function actual_time(){
     time = new Date();
-    return (time.getDay() + "." + time.getMonth() + "." + time.getFullYear() + " " + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds() + " --- ");
+    return (time.getDate() + "." + (time.getMonth() + 1) + "." + time.getFullYear() + " " + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds() + " --- ");
 }
