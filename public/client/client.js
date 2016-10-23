@@ -29,13 +29,12 @@ $(document).ready(function(){
 
 //init the website and variables
 function init(){
-    users = [{Id: 0, Name: "Christian"}, {Id: 1, Name: "Vali"}];
     users.forEach(function(user, index, array){
         $("#debugUser").append("<option value='"+index+"'>"+user.Name+"</option>");    
     });
     
     currentEsp = parseInt($("#esps").val());
-    currentColor = $("#colorInput").val();
+    currentColor = hexToRGBColor($("#colorInput").val());
     currentMode = parseInt($("#modes").val());
     debugMode = false;
     currentDebugUser = users[0];
@@ -47,7 +46,7 @@ function espChanged(event){
 }
 
 function colorChanged(event){
-    currentColor = $("#colorInput").val();
+    currentColor = hexToRGBColor($("#colorInput").val());
 }
 
 function modeChanged(event){
@@ -70,13 +69,20 @@ function debugUserChanged(event){
 }
 
 function submitData(event){
-    var isValid = (currentEsp !== undefined) && ((currentColor !== undefined) || (currentMode !== undefined));
+    var isValid = (currentEsp !== undefined) && ((currentColor !== undefined) || (currentMode !== undefined) || (debugEnabled && currentDebugUser !== undefined));
     
     if(!isValid)
         return;
     
-    var esp = new ESP(currentEsp,currentColor,currentMode,debugEnabled);
+    var esp = new ESP(currentEsp,currentColor,currentMode,debugEnabled, currentDebugUser);
     socket.emit("go", esp);
     
+}
+
+function hexToRGBColor(hex){
+    var r = parseInt(hex.substring(1,3),16);
+    var g = parseInt(hex.substring(3,5),16);
+    var b = parseInt(hex.substring(5,7),16);
+    return {R: r, G: g, B: b};
 }
 
