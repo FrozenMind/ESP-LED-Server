@@ -21,8 +21,8 @@ var time;
 //wenn sich jemand einloggt wird die Website  geliefert
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/public/index.html');    
-    log(os.userInfo().username + " connected.");
-    console.log(os.userInfo());
+    //log(os.userInfo().username + " connected.");
+    //console.log(os.userInfo());
 });
 
 
