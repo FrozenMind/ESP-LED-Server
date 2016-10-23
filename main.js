@@ -1,5 +1,6 @@
 //variablen zur kommunikation
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var os = require('os');
@@ -8,8 +9,10 @@ var os = require('os');
 var TelegramBot = require('node-telegram-bot-api');
 var token = '265274462:AAFtbuN6p80ywv0MJ1UJbS51SsZjM4fF854';
 var bot = new TelegramBot(token, {polling: true});
-var valiID = 240395214;
-var chrisID = 196173672;
+var valiId = 240395214;
+var chrisId = 196173672;
+var debugUser = undefined;
+var users = undefined;
 
 //log file
 var fs = require('fs');
@@ -20,25 +23,39 @@ var time;
 
 //wenn sich jemand einloggt wird die Website  geliefert
 app.get('/', function (req, res) {
+    app.use(express.static('public'));
     res.sendFile(__dirname + '/public/index.html');    
-    //log(os.userInfo().username + " connected.");
+    log(os.userInfo().username + " connected.");
     //console.log(os.userInfo());
 });
 
 
 //wenn sich ein user einloggt
 io.on('connection', function (socket) {
+    //whitelist users aus textdatei einlesen in array speichern und an client schicken
+    users = [{Id: 0, Name: "Christian"}, {Id: 1, Name: "Valentin"}];
+    socket.emit('whitelist', users);
     
-    //wenn eine nachricht übermittelt wird
+    
+    //wenn ein befehl übermittelt wird
     socket.on('go', function (e) {
-   //wenn debug an ist wird alles per telegram gesendet
-        if(e.debug == true){   
-            log("debug mode von " + e.debugID + " gestartet");
-            bot.sendMessage(e.debugID, actual_time() + "\nESP: " + e.id + "\n" + "Color: R: " + e.color.r + ", G: " + e.color.g + ", B: " + e.color.b + "\n" + "Mode: "  + e.mode);        
+    console.log(e);
+        //wenn debug an ist wird alles per telegram gesendet
+        if(e.Debug == true){   
+            switch(e.DebugId){
+                case 0:
+                    debugUser = chrisId;
+                    break;
+                case 1:
+                    debugUser = valiId;
+                    break;
+            }
+            log("debug mode von " + debugUser + " gestartet");
+            bot.sendMessage(debugUser, actual_time() + "ESP: " + e.Id + "\n Color: " + e.Color + "\n Mode: "  + e.Mode);        
         }
         
     //!TODO! geloggt und an esp übermittelt wird immer hier
-        log(e.debugID, actual_time() + "\nESP: " + e.id + "\n" + "Color: R: " + e.color.r + ", G: " + e.color.g + ", B: " + e.color.b + "\n" + "Mode: "  + e.mode);               
+        log("ESP: " + e.Id + "\n Color: " + e.Color + "\n Mode: "  + e.Mode);               
         
     });
 
