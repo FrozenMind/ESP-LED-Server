@@ -13,9 +13,8 @@ $(document).ready(function(){
     
     socket.on("whitelist", function(list){
         users = list;
+        init();
     });
-    
-    init();
     
     //Events registrieren
     $("#esps").change(espChanged);
@@ -74,7 +73,7 @@ function submitData(event){
     if(!isValid)
         return;
     
-    var esp = new ESP(currentEsp,currentColor,currentMode,debugEnabled, currentDebugUser);
+    var esp = new ESP(currentEsp,currentColor,currentMode,debugEnabled, currentDebugUser.Id);
     socket.emit("go", esp);
     
 }
