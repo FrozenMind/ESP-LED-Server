@@ -25,14 +25,13 @@ var time;
 app.get('/', function (req, res) {
     app.use(express.static('public'));
     res.sendFile(__dirname + '/public/index.html');    
-    log(os.userInfo().username + " connected.");
     console.log(os.userInfo());
 });
 
 
 //wenn sich ein user einloggt
 io.on('connection', function (socket) {
-    log("User connected");
+    log(os.userInfo().username + " connected.");
     //whitelist users aus textdatei einlesen in array speichern und an client schicken
     if(users == undefined || users.length == 0){
         log("No Users defined, read in whitelist...");
@@ -54,9 +53,12 @@ io.on('connection', function (socket) {
             log("Reading Whitelist file completed");
             log(""+users.length+" on the whitelist");
             log("Sending Users to client");
-            socket.emit("whitelist",users);
+            
         });
     }
+    
+    if(users != undefined)
+        socket.emit("whitelist",users);
     
     //wenn ein befehl übermittelt wird
     socket.on('go', function(e) {
