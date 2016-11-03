@@ -28,15 +28,9 @@ var time;
 app.get('/', function (req, res) {
     app.use(express.static('public'));
     res.sendFile(__dirname + '/public/index.html');
-});
-
-
-//wenn sich ein user einloggt
-io.on('connection', function (socket) {
-    log(os.userInfo().username + " connected.");
-    //whitelist users aus textdatei einlesen in array speichern und an client schicken
-        log("No Users defined, read in whitelist...");
-        
+    
+    //whitelist einlesen
+    log("No Users defined, read in whitelist...");  
         fs_wl.readFile('whitelist.csv', {encoding: "utf8", flag: "r"}, function(err,data){
             if(err)
                 log(err);
@@ -53,13 +47,19 @@ io.on('connection', function (socket) {
             }
             log("Reading Whitelist file completed");
             log(""+users.length+" on the whitelist");
-
         });
+});
 
-    if(users != undefined){
-        log("Sending Users to client");
-        socket.emit("whitelist",users);
-    }
+
+//wenn sich ein user einloggt
+io.on('connection', function (socket) {
+    log(os.userInfo().username + " connected.");
+   
+    //bei connection whitelist an client senden
+    log("Sending Users to client");
+    socket.emit("whitelist", users);
+    
+    
     //wenn ein befehl übermittelt wird
     socket.on('go', function(e) {
         log("Client command recieved");

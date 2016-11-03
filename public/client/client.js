@@ -12,6 +12,8 @@ $(document).ready(function(){
     socket = io();
     
     socket.on("whitelist", function(list){
+        console.log("user erhalten");
+        console.log(list);
         users = list;
         init();
     });
@@ -23,7 +25,6 @@ $(document).ready(function(){
     $("#debugMode").click(debugChanged);
     $("#debugUser").change(debugUserChanged);
     $("#go").click(submitData);
-    
 });
 
 //init the website and variables
