@@ -4,6 +4,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var os = require('os');
+var net = require('net');
 
 //Telegram bot init
 var TelegramBot = require('node-telegram-bot-api');
@@ -74,7 +75,12 @@ io.on('connection', function (socket) {
         }
         
         //!TODO! geloggt und an esp übermittelt wird immer hier
-        log("ESP: " + e.Id + "\n Color: " + e.Color + "\n Mode: "  + e.Mode);               
+        log("ESP: " + e.Id + "\n Color: " + e.Color + "\n Mode: "  + e.Mode);
+        var client = new net.Socket();
+        client.connect(8080, '192.168.0.66', function() {
+	       console.log('Connected');
+	       client.write('Hello, server! Love, Client.');
+        });
     });
     
     socket.on("disconnect", function(data){
