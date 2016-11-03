@@ -17,7 +17,8 @@ var users = [];
 
 //log file
 var fs = require('fs');
-var fs2 = require('fs');
+//fs whitelist
+var fs_wl = require('fs');
 var log_file;
 
 //sonstige variablen
@@ -34,10 +35,9 @@ app.get('/', function (req, res) {
 io.on('connection', function (socket) {
     log(os.userInfo().username + " connected.");
     //whitelist users aus textdatei einlesen in array speichern und an client schicken
-    if(users == undefined || users.length == 0){
         log("No Users defined, read in whitelist...");
-
-        fs2.readFile('whitelist.csv', {encoding: "utf8", flag: "r"}, function(err,data){
+        
+        fs_wl.readFile('whitelist.csv', {encoding: "utf8", flag: "r"}, function(err,data){
             if(err)
                 log(err);
 
@@ -55,7 +55,6 @@ io.on('connection', function (socket) {
             log(""+users.length+" on the whitelist");
 
         });
-    }
 
     if(users != undefined){
         log("Sending Users to client");
@@ -74,7 +73,7 @@ io.on('connection', function (socket) {
 
         //!TODO! geloggt und an esp übermittelt wird immer hier
 
-        log("\tESP: " + e.Id + "\n\t\t\tColor: " + " R: " + e.Color.R+ " G: " + e.Color.G+ " B: " + e.Color.B + "\n\t\t\tMode: "  + e.Mode);
+        log("\tESP: " + e.Id + "\tColor: " + " R: " + e.Color.R+ " G: " + e.Color.G+ " B: " + e.Color.B + "\tMode: "  + e.Mode);
         var client = new net.Socket();
         client.connect(8080, '192.168.0.66', function() {
 	         console.log('Connected');
@@ -103,7 +102,7 @@ bot.on('message', function (msg) {
 
 //console.log methode überschreiben, dass er alles in einer datei speichert
 var log = function(d) {
-    log_file = fs.createWriteStream(__dirname + '/public/log/debug_' + (new Date().getDate()) + "" + (new Date().getMonth() + 1) + '.log', {flags : 'a'});
+    log_file = fs.createWriteStream(__dirname + '/public/log/debug_' + (new Date().getDate()) + "_" + (new Date().getMonth() + 1) + '.log', {flags : 'a'});
     log_file.open();
     log_file.write(actual_time() + "" + d + "\r\n");
     log_file.close();
