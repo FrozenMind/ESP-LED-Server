@@ -69,7 +69,7 @@ io.on('connection', function (socket) {
         {
             debugUser = users[e.DebugId].TelegramId;
             log("Debug Mode enabled by "+debugUser);
-            bot.sendMessage(debugUser, actual_time() + "\nESP: " + e.Id + "\n Color: " + " R: " + e.Color.R+ " G: " + e.Color.G+ " B: " + e.Color.B + "\n Mode: "  + e.Mode);
+            bot.sendMessage(debugUser, actual_time() + "\nESP: " + e.Id + "\nColor: " + " R: " + e.Color.R+ " G: " + e.Color.G+ " B: " + e.Color.B + "\nMode: "  + e.Mode);
         }
 
         //!TODO! geloggt und an esp übermittelt wird immer hier
