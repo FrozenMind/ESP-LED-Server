@@ -73,6 +73,7 @@ io.on('connection', function (socket) {
         }
 
         //!TODO! geloggt und an esp übermittelt wird immer hier
+
         log("\tESP: " + e.Id + "\n\t\t\tColor: " + " R: " + e.Color.R+ " G: " + e.Color.G+ " B: " + e.Color.B + "\n\t\t\tMode: "  + e.Mode);
         var client = new net.Socket();
         client.connect(8080, '192.168.0.66', function() {
