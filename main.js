@@ -4,6 +4,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var os = require('os');
+var net = require('net');
 
 //Telegram bot init
 var TelegramBot = require('node-telegram-bot-api');
@@ -16,7 +17,8 @@ var users = [];
 
 //log file
 var fs = require('fs');
-var log_file = fs.createWriteStream(__dirname + '/public/log/debug.log', {flags : 'a'});
+var fs2 = require('fs');
+var log_file;
 
 //sonstige variablen
 var time;
@@ -24,8 +26,7 @@ var time;
 //wenn sich jemand einloggt wird die Website  geliefert
 app.get('/', function (req, res) {
     app.use(express.static('public'));
-    res.sendFile(__dirname + '/public/index.html');    
-    console.log(os.userInfo());
+    res.sendFile(__dirname + '/public/index.html');
 });
 
 
@@ -35,12 +36,12 @@ io.on('connection', function (socket) {
     //whitelist users aus textdatei einlesen in array speichern und an client schicken
     if(users == undefined || users.length == 0){
         log("No Users defined, read in whitelist...");
-        
-        fs.readFile('whitelist.csv', {encoding: "utf8", flag: "r"}, function(err,data){
+
+        fs2.readFile('whitelist.csv', {encoding: "utf8", flag: "r"}, function(err,data){
             if(err)
                 log(err);
-            
-            var lines = data.split("\r\n");
+
+            var lines = data.split(/\r\n|\n/);
             //Erste Zeile enthält lediglich Spezifikation der Daten -> Loop bei 1 Starten!
             for(i=1;i<lines.length;i++){
                 var userdata = lines[i].split(",");
@@ -52,35 +53,38 @@ io.on('connection', function (socket) {
             }
             log("Reading Whitelist file completed");
             log(""+users.length+" on the whitelist");
-            log("Sending Users to client");
-            
+
         });
     }
-    
-    if(users != undefined)
+
+    if(users != undefined){
+        log("Sending Users to client");
         socket.emit("whitelist",users);
-    
+    }
     //wenn ein befehl übermittelt wird
     socket.on('go', function(e) {
         log("Client command recieved");
         //wenn debug an ist wird alles per telegram gesendet
         if(e.DebugEnabled)
-        {   
-            log("Debug Mode enabled");
-            debugUser = users[e.DebugId].TelegramId;        
-            
-            log("debug mode von " + debugUser + " gestartet");
-            bot.sendMessage(debugUser, actual_time() + "ESP: " + e.Id + "\n Color: " + e.Color.R+e.Color.G+e.Color.B + "\n Mode: "  + e.Mode);        
+        {
+            debugUser = users[e.DebugId].TelegramId;
+            log("Debug Mode enabled by "+debugUser);
+            bot.sendMessage(debugUser, actual_time() + "\nESP: " + e.Id + "\n Color: " + " R: " + e.Color.R+ " G: " + e.Color.G+ " B: " + e.Color.B + "\n Mode: "  + e.Mode);
         }
-        
+
         //!TODO! geloggt und an esp übermittelt wird immer hier
-        log("ESP: " + e.Id + "\n Color: " + e.Color + "\n Mode: "  + e.Mode);               
+        log("\tESP: " + e.Id + "\n\t\t\tColor: " + " R: " + e.Color.R+ " G: " + e.Color.G+ " B: " + e.Color.B + "\n\t\t\tMode: "  + e.Mode);
+        var client = new net.Socket();
+        client.connect(8080, '192.168.0.66', function() {
+	         console.log('Connected');
+	          client.write('Hello, server! Love, Client.');
+        });
     });
-    
+
     socket.on("disconnect", function(data){
-        log("User disconnected" + data);
+        log(os.userInfo().username + " disconnected.");
     });
-    
+
     socket.on("error", function(err){
         log("[ERROR]: "+err);
     });
@@ -89,17 +93,18 @@ io.on('connection', function (socket) {
 //node listend auf den port
 http.listen(62345, function () {
     log('start listening on *:62345');
-}); 
+});
 
 //passiert wenn man per telegram was schreibt
 bot.on('message', function (msg) {
-    log("Message from Telegramm: "+msg);
+    log("Telegram Message from " + msg.from.id + ": " + msg.text);
 });
 
 //console.log methode überschreiben, dass er alles in einer datei speichert
 var log = function(d) {
+    log_file = fs.createWriteStream(__dirname + '/public/log/debug_' + (new Date().getDate()) + "" + (new Date().getMonth() + 1) + '.log', {flags : 'a'});
     log_file.open();
-    log_file.write(actual_time() + "" + d + "\r\n");       
+    log_file.write(actual_time() + "" + d + "\r\n");
     log_file.close();
 };
 
@@ -113,7 +118,7 @@ function User(id,name,telegramId){
     this.Id = id;
     this.Name = name;
     this.TelegramId = telegramId;
-    
+
     this.ToString = function(){
         return "User "+this.Name+" has the ID "+this.Id+" and the TelegramID "+this.TelegramId;
     }
