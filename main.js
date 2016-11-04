@@ -28,10 +28,10 @@ var time;
 app.get('/', function (req, res) {
     app.use(express.static('public'));
     res.sendFile(__dirname + '/public/index.html');
-    
+
     //whitelist einlesen
     if(users.length == 0){
-    log("No Users defined, read in whitelist...");  
+    log("No Users defined, read in whitelist...");
         fs_wl.readFile('whitelist.csv', {encoding: "utf8", flag: "r"}, function(err,data){
             if(err)
                 log(err);
@@ -48,7 +48,7 @@ app.get('/', function (req, res) {
             }
             log("Reading Whitelist file completed");
             log(""+users.length+" on the whitelist");
-        });   
+        });
     }
 });
 
@@ -56,12 +56,12 @@ app.get('/', function (req, res) {
 //wenn sich ein user einloggt
 io.on('connection', function (socket) {
     log(socket.handshake.address + " connected.");
-   
+
     //bei connection whitelist an client senden
     log("Sending Users to client");
     socket.emit("whitelist", users);
-    
-    
+
+
     //wenn ein befehl übermittelt wird
     socket.on('go', function(e) {
         log("Client command recieved");

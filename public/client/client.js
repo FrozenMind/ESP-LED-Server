@@ -1,6 +1,8 @@
 var socket = undefined;
 var users = undefined;
 
+//esp array in dem jeweils der aktuelle status jeden Esps steht
+var esp_arr = [];
 var currentEsp = undefined;
 var currentColor = undefined;
 var currentMode = undefined;
@@ -8,16 +10,16 @@ var debugEnabled = undefined;
 var currentDebugUser = undefined;
 
 $(document).ready(function(){
-   
+
     socket = io();
-    
+
     socket.on("whitelist", function(list){
         console.log("user erhalten");
         console.log(list);
         users = list;
         init();
     });
-    
+
     //Events registrieren
     $("#esps").change(espChanged);
     $("#colorInput").change(colorChanged);
@@ -30,9 +32,9 @@ $(document).ready(function(){
 //init the website and variables
 function init(){
     users.forEach(function(user, index, array){
-        $("#debugUser").append("<option value='"+index+"'>"+user.Name+"</option>");    
+        $("#debugUser").append("<option value='"+index+"'>"+user.Name+"</option>");
     });
-    
+
     currentEsp = parseInt($("#esps").val());
     currentColor = hexToRGBColor($("#colorInput").val());
     currentMode = parseInt($("#modes").val());
@@ -47,6 +49,8 @@ function espChanged(event){
 
 function colorChanged(event){
     currentColor = hexToRGBColor($("#colorInput").val());
+    //hintergrundfarbe wird die farbe die über das colorPanel ausgewählt wurde
+    document.body.style.background = $("#colorInput").val();
 }
 
 function modeChanged(event){
@@ -70,13 +74,14 @@ function debugUserChanged(event){
 
 function submitData(event){
     var isValid = (currentEsp !== undefined) && ((currentColor !== undefined) || (currentMode !== undefined) || (debugEnabled && currentDebugUser !== undefined));
-    
+
     if(!isValid)
         return;
-    
+
     var esp = new ESP(currentEsp,currentColor,currentMode,debugEnabled, currentDebugUser.Id);
+    esp_arr[currentEsp] = esp;
     socket.emit("go", esp);
-    
+
 }
 
 function hexToRGBColor(hex){
@@ -85,4 +90,3 @@ function hexToRGBColor(hex){
     var b = parseInt(hex.substring(5,7),16);
     return {R: r, G: g, B: b};
 }
-
