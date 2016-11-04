@@ -45,6 +45,17 @@ function init(){
 //Event funktionen
 function espChanged(event){
     currentEsp = parseInt($("#esps").val());
+    //aktuelle modi des esps in die anderen felder laden
+    //var cColor = esp_arr[currentEsp].Color;
+    //var cMode = esp_arr[currentEsp].Mode;
+    //var cDebug = esp_arr[currentEsp].DebugEnabled;
+    //var cDebugId = esp_arr[currentEsp].DebugId;
+
+    //document.getElementById("color").value = cColor;
+    //document.getElementById("mode").value = cMode;
+    //document.getElementById("debugMode").checked = cDebug;
+    //document.getElementById("debugUser").value = cDebugId;
+
 }
 
 function colorChanged(event){
