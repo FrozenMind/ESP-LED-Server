@@ -5,6 +5,8 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var os = require('os');
 var net = require('net');
+var server = undefined;
+var clients = [];
 
 //Telegram bot init
 var TelegramBot = require('node-telegram-bot-api');
@@ -23,6 +25,26 @@ var log_file;
 
 //sonstige variablen
 var time;
+
+
+function createTCPServer(){
+    server = net.createServer(function(c) {
+        clients.push(c);
+        log("Client connected to TCP Server");
+        c.on("end", function(){
+            log("Client disconnected")
+            clients.slice(clients.indexOf(c),1);
+        })
+    })
+}
+
+server.on("error", function(err){
+    log("[ERROR] "+err);
+})
+
+server.listen(8124, function(){
+    log("TCP Server listening on Port 8124");
+})
 
 //wenn sich jemand einloggt wird die Website  geliefert
 app.get('/', function (req, res) {
@@ -76,11 +98,11 @@ io.on('connection', function (socket) {
         //!TODO! geloggt und an esp übermittelt wird immer hier
 
         log("\tESP: " + e.Id + "\tColor: " + " R: " + e.Color.R+ " G: " + e.Color.G+ " B: " + e.Color.B + "\tMode: "  + e.Mode);
-        var client = new net.Socket();
-        client.connect(8080, '192.168.0.66', function() {
-	         console.log('Connected');
-	          client.write('Hello, server! Love, Client.');
-        });
+        
+        //Send to ESP
+        clients[e.Id].write(""+e.Color.R+","+e.Color.G+","+e.Color.B+";"+e.Mode);
+        
+        
     });
 
     socket.on("disconnect", function(data){
