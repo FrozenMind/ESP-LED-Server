@@ -26,6 +26,7 @@ var log_file;
 //sonstige variablen
 var time;
 
+createTCPServer()
 
 function createTCPServer(){
     server = net.createServer(function(c) {
