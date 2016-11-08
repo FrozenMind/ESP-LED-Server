@@ -15,32 +15,23 @@ var bot = new TelegramBot(token, {polling: true});
 
 //Users
 var debugUser = undefined;
-var users = [];
+var users = undefined;
 
 //Logger speichern und starten
 var logger = new Logger();
 logger.StartLogging();
 
-//fs whitelist
-var fs_wl = require('fs');
-
-//sonstige variablen
-var time;
-
-createTCPServer()
-
-function createTCPServer(){
-    server = net.createServer(function(c) 
+//TCP Server erzeugen!
+server = net.createServer(function(c) 
+{
+    clients.push(c);
+    logger.LogString("Client connected to TCP Server");
+    c.on("end", function()
     {
-        clients.push(c);
-        logger.LogString("Client connected to TCP Server");
-        c.on("end", function()
-        {
-            logger.LogString("Client disconnected from TCP Server");
-            clients.slice(clients.indexOf(c),1);
-        });
+        logger.LogString("Client disconnected from TCP Server");
+        clients.slice(clients.indexOf(c),1);
     });
-}
+});
 
 server.on("error", function(err){
     logger.LogError(err);
@@ -51,34 +42,19 @@ server.listen(8124, function(){
     logger.LogString("TCP Server listening on Port 8124");
 });
 
+//node listend auf den port
+http.listen(62345, function () {
+    logger.LogString('HTTP Server listening on Port 62345');
+});
+
 //wenn sich jemand einloggt wird die Website  geliefert
 app.get('/', function (req, res) {
     app.use(express.static('public'));
     res.sendFile(__dirname + '/public/index.html');
 
     //whitelist einlesen
-    if(users.length == 0){
-    logger.LogString("No Users defined, read in whitelist...");
-        fs_wl.readFile('whitelist.csv', {encoding: "utf8", flag: "r"}, function(err,data){
-            if(err)
-                logger.LogError(err);
-
-            var lines = data.split(/\r\n|\n/);
-            //Erste Zeile enthält lediglich Spezifikation der Daten -> Loop bei 1 Starten!
-            for(i=1;i<lines.length;i++){
-                var userdata = lines[i].split(",");
-                var userId = parseInt(userdata[0]);
-                var userName = userdata[1];
-                var telegramId = userdata[2];
-                var tmpUser = new User(userId,userName,telegramId);
-                users.push(tmpUser);
-            }
-            logger.LogString("Reading Whitelist file completed");
-            logger.LogString(""+users.length+" on the whitelist");
-        });
-    }
+    users = GetWhitelistUsers();
 });
-
 
 //wenn sich ein user einloggt
 io.on('connection', function (socket) {
@@ -118,25 +94,57 @@ io.on('connection', function (socket) {
     });
 });
 
-//node listend auf den port
-http.listen(62345, function () {
-    logger.LogString('HTTP Server listening on Port 62345');
-});
-
 //passiert wenn man per telegram was schreibt
 bot.on('message', function (msg) {
     logger.LogString("Telegram Message from " + msg.from.id + ": " + msg.text);
 });
 
+//-----------Hilfsfunktionen-------------------
+//Liest die Whitelist ein, wenn noch keine User initialisiert wurden.
+//Gibt ein Array mit den Usern zurück
+function GetWhitelistUsers()
+{
+    var arr = new Array();
+    var fs_wl = require("fs");
+    
+    if(users !== undefined)
+    {    
+        logger.LogString("Users already defined");
+        return users;
+    }
+    
+    logger.LogString("No Users defined, read in whitelist...");
+    var data = fs_wl.readFileSync('whitelist.csv', {encoding: "utf8", flag: "r"})
+    
+    if(data === "")
+        logger.LogError(err);
+
+    var lines = data.split(/\r\n|\n/);
+    //Erste Zeile enthält lediglich Spezifikation der Daten -> Loop bei 1 Starten!
+    for(i=1;i<lines.length;i++){
+        var userdata = lines[i].split(",");
+        var userId = parseInt(userdata[0]);
+        var userName = userdata[1];
+        var telegramId = userdata[2];
+        var tmpUser = new User(userId,userName,telegramId);
+        arr.push(tmpUser);
+    }
+    logger.LogString("Reading Whitelist file completed");
+    logger.LogString(""+arr.length+" on the whitelist");
+    
+    return arr;
+}
 
 //gibt die aktuelle Zeit zurück
 function actual_date(){
-    time = new Date();
+    var time = new Date();
     var dateString = time.getDate() + "." + (time.getMonth() + 1) + "." + time.getFullYear() + 
         " " + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds()+ "---";
     
     return dateString;
 }
+
+//------------Hilfsklassen -------------------
 
 function User(id,name,telegramId)
 {
@@ -163,17 +171,9 @@ function Logger()
         this.Writer.write("--- START ---\r\n");
     }
     this.LogString = function(info){
-        //this.Writer.access(this.Path, this.FileSystem.constants.R_OK | this.FileSystem.constants.F_OK, function(err){
-          //  console.log(err ? 'no access!' : 'can read/write');
-            //return;
-        //});
         this.Writer.write("[DEBUG]:\t"+info+"\r\n");
     }
     this.LogError = function(err){
-        //this.Writer.access(this.Path, this.FileSystem.constants.R_OK | this.FileSystem.constants.F_OK, function(err){
-            //console.log(err ? 'no access!' : 'can read/write');
-          //  return;
-        //});
         this.Writer.write("\r\n[ERROR]:\t"+err+ "\r\n");
     }
     this.StopLogging = function(){
@@ -185,7 +185,7 @@ function Logger()
             return this.FileName;
         
         var date = new Date();
-        this.FileName = date.getDate()+"_"+date.getMonth()+"_"+date.getYear()+".log";
+        this.FileName = date.getDate()+"_"+date.getMonth()+"_"+date.getFullYear()+".log";
         return this.FileName;
     }
 }
