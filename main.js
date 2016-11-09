@@ -6,7 +6,6 @@ var io = require('socket.io')(http);
 var os = require('os');
 var net = require('net');
 var server = undefined;
-var clients = [];
 
 //Telegram bot init
 var TelegramBot = require('node-telegram-bot-api');
@@ -16,6 +15,9 @@ var bot = new TelegramBot(token, {polling: true});
 //Users
 var debugUser = undefined;
 var users = undefined;
+
+//ESP Clients
+var clients = new Array();
 
 //Logger speichern und starten
 var logger = new Logger();
