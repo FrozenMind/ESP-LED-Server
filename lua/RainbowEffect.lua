@@ -14,23 +14,23 @@ NumberOfLeds = 16 -- LED Anzahl
 buffer = ws2812.newBuffer(numberOfLeds,3) -- Buffer
 
 -- Errechnen wie viele LEDs die jeweilige Farbe bekommt
-ColorAmount = math.floor(NumberOfLeds / RainbowColorsSize
+ColorAmount = math.floor(NumberOfLeds / RainbowColorsSize)
 ColorMod = NumberOfLeds % RainbowColorsSize
 
 -- Speichern der Anzahl
 ColorAmountTable = {}
-for i, RainbowColorsSize,1 do 
+for i = 0, RainbowColorsSize, 1 do 
 	ColorAmountTable[RainbowColors[i]] = ColorAmount
 end
 
 if ColorMod > 0
-	for j, ColorMod, 1 do
-		ColorAmount[RainbowColors[j]] += 1
+	for j = 0, ColorMod, 1 do
+		ColorAmount[RainbowColors[j]] = ColorAmount[RainbowColors[j]] + 1
 	end
 end
 
 -- Füllen des Buffers
-for k, NumberOfLeds, 1 do
+for k = 0, NumberOfLeds, 1 do
 	for m, ColorAmountTable[RainbowColors[k]], 1 do
 		buffer:fill(RainbowColors[m])
 	end
@@ -45,7 +45,7 @@ end
 function GetArraySize(arr)
 	count = 0
 	for i,v in ipairs(arr) do 
-		count = count +1 
+		count = count + 1 
 	end
 	return count
 end
