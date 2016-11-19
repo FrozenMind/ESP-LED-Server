@@ -1,5 +1,4 @@
 -- Variabel
-Color = string.char(math.random(255), math.random(255), math.random(255))
 Off = string.char(0,0,0)
 numberOfLEDs = 16
 timeoutTime = 1000000
