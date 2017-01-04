@@ -60,8 +60,6 @@ function espChanged(event){
 
 function colorChanged(event){
     currentColor = hexToRGBColor($("#colorInput").val());
-    //hintergrundfarbe wird die farbe die über das colorPanel ausgewählt wurde
-    document.body.style.background = $("#colorInput").val();
 }
 
 function modeChanged(event){
