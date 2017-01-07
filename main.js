@@ -83,8 +83,9 @@ io.on('connection', function (socket) {
         
         delete e.DebugEnabled;
         delete e.DebugId;
+	
         //Send to ESP
-        clients[e.Id].write(e.toString());
+        clients[e.Id].write(JSON.stringify(e));
         
     });
 

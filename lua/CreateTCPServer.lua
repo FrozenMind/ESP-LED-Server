@@ -1,5 +1,5 @@
 server = net.createServer(net.TCP,30)
-server:listen(8080, "192.168.0.66", function(c)
+server:listen(8080, "192.168.1.1", function(c)
     c:on("connection",function(sck, d)
         print("User connected")
         end)

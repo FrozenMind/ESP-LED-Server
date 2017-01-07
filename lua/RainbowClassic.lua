@@ -1,8 +1,7 @@
 function GetArraySize(arr)
     local count = 0
     for i,v in ipairs(arr) do 
-        count = count + 1 
-        print(count)
+        count = count + 1
     end
     return count
 end
@@ -18,8 +17,8 @@ Violet = string.char(0,127,255)
 
 RainbowColors = {Red,Orange,Yellow,Green,Blue,Indigo,Violet} -- Array mit allen Farben
 RainbowColorsSize = GetArraySize(RainbowColors) -- Array Größez
-print("RainbowColorSize: ", RainbowColorsSize)
 NumberOfLeds = 16 -- LED Anzahl
+
 ws2812.init()
 buffer = ws2812.newBuffer(NumberOfLeds,3) -- Buffer
 
@@ -46,6 +45,6 @@ for k = 0, NumberOfLeds-1, 1 do
 end
 
 -- Rainbow Effekt anzeigen
-
+ws2812.write(buffer)
 
 

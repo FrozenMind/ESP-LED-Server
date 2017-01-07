@@ -17,16 +17,16 @@ buffer = ws2812.newBuffer(numberofleds, 3)
 
 shiftForward = true
 i = 1
-tmr.alarm(0,30,tmr.ALARM_AUTO, function()
+tmr.alarm(0,50,tmr.ALARM_AUTO, function()
     if(i == numberofleds) then
         shiftForward = false
-        index = ((index+1) % arraysize) + 1
-        Color = colors[index]
+        CalcIndex()
+        SwitchColor(index)
     end
     if(i==1) then
         shiftForward = true
-        index = ((index+1) % arraysize) + 1
-        Color = colors[index]
+        CalcIndex()
+        SwitchColor(index)
     end
 
     if(shiftForward) then
@@ -38,3 +38,11 @@ tmr.alarm(0,30,tmr.ALARM_AUTO, function()
     buffer:fade(2)
     buffer:set(i, Color)
 end)
+
+function CalcIndex()
+    index = ((index+1) % arraysize) + 1
+end
+
+function SwitchColor(index)
+    Color = colors[index]
+end
