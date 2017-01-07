@@ -75,14 +75,16 @@ io.on('connection', function (socket) {
         {
             debugUser = users[e.DebugId].TelegramId;
             logger.LogString("Debug Mode enabled by "+debugUser);
-            bot.sendMessage(debugUser, actual_date() + "\nESP: " + e.Id + "\nColor: " + " R: " + e.Color.R+ " G: " + e.Color.G+ " B: " + e.Color.B + "\nMode: "  + e.Mode);
+            bot.sendMessage(debugUser, actual_date() + "\nESP: " + e.Id + "\nColor: " + " R: " + e.R+ " G: " + e.G+ " B: " + e.B + "\nMode: "  + e.Mode);
         }
 
         //Log Befehl
-        logger.LogString("ESP: " + e.Id + "\tColor: " + " R: " + e.Color.R+ " G: " + e.Color.G+ " B: " + e.Color.B + "\tMode: "  + e.Mode);
+        logger.LogString("ESP: " + e.Id + "\tColor: " + " R: " + e.R+ " G: " + e.G+ " B: " + e.B + "\tMode: "  + e.Mode);
         
+        delete e.DebugEnabled;
+        delete e.DebugId;
         //Send to ESP
-        clients[e.Id].write(""+e.Color.R+","+e.Color.G+","+e.Color.B+";"+e.Mode);
+        clients[e.Id].write(e.toString());
         
     });
 
