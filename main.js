@@ -194,13 +194,13 @@
      }
  }
 
+ //lokale attribute als test
+ var local_esp = undefined;
+ var local_mode = undefined;
+ var local_color = undefined;
  //telegram bot zum steuern
  bot.on('message', function(msg) {
      console.log("Text received: " + msg.text);
-     //lokale attribute als test
-     var local_esp = undefined;
-     var local_mode = undefined;
-     var local_color = undefined;
      switch (msg.text.toLowerCase()) {
          case 'start':
          case 'restart':
