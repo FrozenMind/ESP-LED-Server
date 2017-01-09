@@ -8,7 +8,9 @@ Indigo = string.char(0,75,130)
 Violet = string.char(0,127,255)
 
 colors = {Red,Orange,Yellow,Green,Blue,Indigo,Violet}
-
+arraysize = 7
+Color = colors[1]
+index = 1
 ws2812.init()
 numberofleds = 16
 buffer = ws2812.newBuffer(numberofleds, 3)
@@ -22,7 +24,9 @@ tmr.alarm(0,100,tmr.ALARM_AUTO, function()
     if(pos == 0) then
         shiftForward = true        
     end
-
+    if(pos == numberofleds / 2) then
+        SwitchColor()
+    end
     if(shiftForward) then
         pos = pos + 1
     else
@@ -34,4 +38,7 @@ tmr.alarm(0,100,tmr.ALARM_AUTO, function()
     buffer:set(numberofleds - pos, Color)
 end)
 
-
+function SwitchColor()
+    index = ((index+1) % arraysize) + 1
+    Color = colors[index]
+end
