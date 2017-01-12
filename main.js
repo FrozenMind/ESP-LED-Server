@@ -36,7 +36,14 @@
      });
 
      c.on('data', function(data) {
-         console.log(data);
+         console.log(data.toString());
+         try {
+             jsonData = JSON.parse(data);
+         } catch (e) {
+             console.log("no JSON");
+         }
+         console.log(jsonData);
+         clients[e.Id].write(JSON.stringify(e));
      });
  });
 
