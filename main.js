@@ -34,6 +34,10 @@
          logger.LogString("Client disconnected from TCP Server");
          clients.slice(clients.indexOf(c), 1);
      });
+
+     c.on('data', function(data) {
+         console.log(data);
+     });
  });
 
  //TCP Server Fehler
