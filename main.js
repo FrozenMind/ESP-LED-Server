@@ -26,33 +26,33 @@
  logger.StartLogging();
 
  //TCP Server erzeugen!
- server = net.createServer(function (c) {
+ server = net.createServer(function(c) {
      clients.push(c);
      logger.LogString("Client connected to TCP Server");
-     c.on("end", function () {
+     c.on("end", function() {
          logger.LogString("Client disconnected from TCP Server");
          clients.slice(clients.indexOf(c), 1);
      });
  });
 
  //TCP Server Fehler
- server.on("error", function (err) {
+ server.on("error", function(err) {
      logger.LogError(err);
      logger.StopLogging();
  });
 
  //TCP Server starten
- server.listen(8124, function () {
+ server.listen(8124, function() {
      logger.LogString("TCP Server listening on Port 8124");
  });
 
  //HTTP Server starten
- http.listen(62345, function () {
+ http.listen(62345, function() {
      logger.LogString('HTTP Server listening on Port 62345');
  });
 
  //User mit HTTP Server verbunden --> Website liefern
- app.get('/', function (req, res) {
+ app.get('/', function(req, res) {
      app.use(express.static('public'));
      res.sendFile(__dirname + '/public/index.html');
 
@@ -61,16 +61,16 @@
  });
 
  //Verbindung zwischen User und HTTP Server steht
- io.on('connection', function (socket) {
+ io.on('connection', function(socket) {
      logger.LogString(socket.handshake.address + " connected.");
-
+     console.log(socket.handshake.address + " connected.");
      //bei connection whitelist an client senden
      logger.LogString("Sending Users to client");
      socket.emit("whitelist", users);
 
 
      //wenn ein befehl übermittelt wird
-     socket.on('go', function (e) {
+     socket.on('go', function(e) {
          logger.LogString("Client command recieved");
          //wenn debug an ist wird alles per telegram gesendet
          if (e.DebugEnabled) {
@@ -87,13 +87,22 @@
 
      });
 
+     socket.on('data', function(e) {
+         try {
+             jsonData = JSON.parse(data);
+         } catch (e) {
+             console.log("no JSON");
+         }
+         console.log(jsonData);
+     });
+
      //Verbindung zwischen User und HTTP Server getrennt
-     socket.on("disconnect", function (data) {
+     socket.on("disconnect", function(data) {
          logger.LogString("User disconnected from HTTP Server.");
      });
 
      // Fehler bei der Verbindung
-     socket.on("error", function (err) {
+     socket.on("error", function(err) {
          logger.LogError(err);
          logger.StopLogging();
      });
@@ -105,31 +114,31 @@
  var local_mode = undefined;
  var local_color = undefined;
  //telegram bot zum steuern
- bot.on('message', function (msg) {
+ bot.on('message', function(msg) {
      console.log("Text received: " + msg.text);
      switch (msg.text.toLowerCase()) {
-     case 'start':
-     case 'restart':
-         opts = {
-             reply_to_message_id: msg.message_id,
-             reply_markup: JSON.stringify({
-                 keyboard: [
+         case 'start':
+         case 'restart':
+             opts = {
+                 reply_to_message_id: msg.message_id,
+                 reply_markup: JSON.stringify({
+                     keyboard: [
                          ['Testboard'],
                          ['Valentins Schreibtisch'],
                          ['Vitrine']
                      ]
-             })
-         };
-         bot.sendMessage(msg.chat.id, "Welchen ESP willst du steuern?", opts);
-         break;
-     case 'testboard':
-     case 'valentins schreibtisch':
-     case 'vitrine':
-         local_esp = msg.text;
-         opts = {
-             reply_to_message_id: msg.message_id,
-             reply_markup: JSON.stringify({
-                 keyboard: [
+                 })
+             };
+             bot.sendMessage(msg.chat.id, "Welchen ESP willst du steuern?", opts);
+             break;
+         case 'testboard':
+         case 'valentins schreibtisch':
+         case 'vitrine':
+             local_esp = msg.text;
+             opts = {
+                 reply_to_message_id: msg.message_id,
+                 reply_markup: JSON.stringify({
+                     keyboard: [
                          ['Color'],
                          ['RandomBlink'],
                          ['PingPongClassic'],
@@ -138,35 +147,35 @@
                          ['RainbowClassic'],
                          ['Restart']
                      ]
-             })
-         };
-         bot.sendMessage(msg.chat.id, "Welchen Modus willst du?", opts);
-         break;
-     case 'randomblink':
-     case 'pingpongclassic':
-     case 'Pingpongrgb':
-     case 'pingpongdouble':
-     case 'rainbowclassic':
-         local_mode = msg.text;
-         //starten der led
-         bot.sendMessage(msg.chat.id, "Gestartet--> ESP: " + local_esp + ", Mode: " + local_mode);
-         break;
-         //bei auswahl dieser modi ist eine farbe erfordelich
-     case 'color':
-         local_mode = msg.text;
-         opts = {
-             reply_to_message_id: msg.message_id,
-             reply_markup: JSON.stringify({
-                 keyboard: [
+                 })
+             };
+             bot.sendMessage(msg.chat.id, "Welchen Modus willst du?", opts);
+             break;
+         case 'randomblink':
+         case 'pingpongclassic':
+         case 'Pingpongrgb':
+         case 'pingpongdouble':
+         case 'rainbowclassic':
+             local_mode = msg.text;
+             //starten der led
+             bot.sendMessage(msg.chat.id, "Gestartet--> ESP: " + local_esp + ", Mode: " + local_mode);
+             break;
+             //bei auswahl dieser modi ist eine farbe erfordelich
+         case 'color':
+             local_mode = msg.text;
+             opts = {
+                 reply_to_message_id: msg.message_id,
+                 reply_markup: JSON.stringify({
+                     keyboard: [
                          ['Green'],
                          ['Red'],
                          ['Blue'],
                          ['Restart']
                      ]
-             })
-         };
-         bot.sendMessage(msg.chat.id, "Welche Farbe willst du?", opts);
-         break;
+                 })
+             };
+             bot.sendMessage(msg.chat.id, "Welche Farbe willst du?", opts);
+             break;
      }
  });
 
@@ -223,7 +232,7 @@
      this.Name = name;
      this.TelegramId = telegramId;
 
-     this.ToString = function () {
+     this.ToString = function() {
          return "User " + this.Name + " has the ID " + this.Id + " and the TelegramID " + this.TelegramId;
      }
  }
@@ -233,7 +242,7 @@
      this.Path = __dirname + "/log/";
      this.FileSystem = require('fs');
      this.FileName = undefined;
-     this.StartLogging = function () {
+     this.StartLogging = function() {
          var today = actual_date(true);
          this.Writer = this.FileSystem.createWriteStream(this.Path + this.GetLogFileName(), {
              flags: 'a'
@@ -241,17 +250,17 @@
          this.Writer.open();
          this.Writer.write("--- START ---\r\n");
      }
-     this.LogString = function (info) {
+     this.LogString = function(info) {
          this.Writer.write("[DEBUG]:\t" + info + "\r\n");
      }
-     this.LogError = function (err) {
+     this.LogError = function(err) {
          this.Writer.write("\r\n[ERROR]:\t" + err + "\r\n");
      }
-     this.StopLogging = function () {
+     this.StopLogging = function() {
          this.Writer.write("--- END ---\r\n");
          this.Writer.close();
      }
-     this.GetLogFileName = function () {
+     this.GetLogFileName = function() {
          if (this.FileName)
              return this.FileName;
 
