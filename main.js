@@ -43,7 +43,7 @@
              console.log("no JSON");
          }
          console.log(jsonData);
-         clients[e.Id].write(JSON.stringify(e));
+         clients[jsonData.Id].write(JSON.stringify(e));
      });
  });
 
