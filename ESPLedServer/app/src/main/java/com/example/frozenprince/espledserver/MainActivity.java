@@ -116,8 +116,6 @@ public class MainActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        tcpChannel = new TCPChannel("192.168.0.1", 62345);
-
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

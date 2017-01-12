@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +36,7 @@ public final class TCPChannel extends Thread {
     @Override
     public void run() {
         try {
-              socket = new Socket(ip, port);
+            this.socket = new Socket(this.ip,this.port);
             new MessageNotifierThread().start();
             this.writer = new PrintWriter(socket.getOutputStream());
             try {
@@ -49,7 +50,7 @@ public final class TCPChannel extends Thread {
             } finally {
                 writer.close();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {

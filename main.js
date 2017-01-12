@@ -27,6 +27,7 @@
 
  //TCP Server erzeugen!
  server = net.createServer(function(c) {
+     console.log("Connected TCP");
      clients.push(c);
      logger.LogString("Client connected to TCP Server");
      c.on("end", function() {
