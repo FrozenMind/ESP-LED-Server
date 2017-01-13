@@ -5,6 +5,7 @@
  var io = require('socket.io')(http);
  var os = require('os');
  var net = require('net');
+ var bunyan = require('bunyan');
  var server = undefined;
 
  //Telegram bot init
@@ -14,6 +15,21 @@
      polling: true
  });
 
+ //Logger init
+ var log = bunyan.createLogger({
+     name: 'ESPServerLogger',
+     streams: [{
+         level: 'debug',
+         stream: process.stdout
+     }, {
+         level: 'info',
+         path: __dirname + '/log/info.log'
+     }, {
+         level: 'error',
+         path: __dirname + '/log/error.log'
+     }]
+ });
+
  //Users
  var debugUser = undefined;
  var users = undefined;
@@ -21,51 +37,45 @@
  //ESP Clients
  var clients = new Array();
 
- //Logger speichern und starten
- var logger = new Logger();
- logger.StartLogging();
-
  //TCP Server erzeugen!
  server = net.createServer(function(c) {
-     console.log("Connected TCP");
+     log.debug("Connected TCP");
      clients.push(c);
-     logger.LogString("Client connected to TCP Server");
+     log.info("Client connected to TCP Server");
      c.on("end", function() {
-         logger.LogString("Client disconnected from TCP Server");
+         log.info("Client disconnected from TCP Server");
          clients.slice(clients.indexOf(c), 1);
      });
 
      c.on('data', function(data) {
-         console.log(data.toString());
          try {
              jsonData = JSON.parse(data);
          } catch (e) {
-             console.log("no JSON");
+             log.debug("No JSON received");
          }
-         console.log(jsonData);
+         log.debug(jsonData);
          clients[jsonData.Id].write(JSON.stringify(jsonData));
      });
 
      c.on('error', function(exc) {
-         console.log(exc);
+         log.error(exc);
          clients.slice(clients.indexOf(c), 1);
      })
  });
 
  //TCP Server Fehler
  server.on("error", function(err) {
-     logger.LogError(err);
-     logger.StopLogging();
+     log.error(err);
  });
 
  //TCP Server starten
  server.listen(8124, function() {
-     logger.LogString("TCP Server listening on Port 8124");
+     log.info("TCP Server listening on Port 8124");
  });
 
  //HTTP Server starten
  http.listen(62345, function() {
-     logger.LogString('HTTP Server listening on Port 62345');
+     log.info('HTTP Server listening on Port 62345');
  });
 
  //User mit HTTP Server verbunden --> Website liefern
@@ -79,25 +89,24 @@
 
  //Verbindung zwischen User und HTTP Server steht
  io.on('connection', function(socket) {
-     logger.LogString(socket.handshake.address + " connected.");
-     console.log(socket.handshake.address + " connected.");
+     log.info(socket.handshake.address + " connected.");
      //bei connection whitelist an client senden
-     logger.LogString("Sending Users to client");
+     log.info("Sending Users to client");
      socket.emit("whitelist", users);
 
 
      //wenn ein befehl übermittelt wird
      socket.on('go', function(e) {
-         logger.LogString("Client command recieved");
+         log.info("Client command recieved");
          //wenn debug an ist wird alles per telegram gesendet
          if (e.DebugEnabled) {
              debugUser = users[e.DebugId].TelegramId;
-             logger.LogString("Debug Mode enabled by " + debugUser);
+             log.info("Debug Mode enabled by " + debugUser);
              bot.sendMessage(debugUser, actual_date() + "\nESP: " + e.Id + "\nColor: " + " R: " + e.R + " G: " + e.G + " B: " + e.B + "\nMode: " + e.Mode);
          }
 
          //Log Befehl
-         logger.LogString("ESP: " + e.Id + "\tColor: " + " R: " + e.R + " G: " + e.G + " B: " + e.B + "\tMode: " + e.Mode);
+         log.info("ESP: " + e.Id + "\tColor: " + " R: " + e.R + " G: " + e.G + " B: " + e.B + "\tMode: " + e.Mode);
 
          //Send to ESP
          clients[e.Id].write(JSON.stringify(e));
@@ -108,20 +117,19 @@
          try {
              jsonData = JSON.parse(data);
          } catch (e) {
-             console.log("no JSON");
+             log.debug("No JSON received");
          }
-         console.log(jsonData);
+         log.debug(jsonData);
      });
 
      //Verbindung zwischen User und HTTP Server getrennt
      socket.on("disconnect", function(data) {
-         logger.LogString("User disconnected from HTTP Server.");
+         log.info("User disconnected from HTTP Server.");
      });
 
      // Fehler bei der Verbindung
      socket.on("error", function(err) {
-         logger.LogError(err);
-         logger.StopLogging();
+         log.error(err);
      });
  });
 
@@ -133,18 +141,18 @@
      var fs_wl = require("fs");
 
      if (users !== undefined) {
-         logger.LogString("Users already defined");
+         log.info("Users already defined");
          return users;
      }
 
-     logger.LogString("No Users defined, read in whitelist...");
+     log.info("No Users defined, read in whitelist...");
      var data = fs_wl.readFileSync('whitelist.csv', {
          encoding: "utf8",
          flag: "r"
      })
 
      if (data === "")
-         logger.LogError(err);
+         log.error(err);
 
      var lines = data.split(/\r\n|\n/);
      //Erste Zeile enthält lediglich Spezifikation der Daten -> Loop bei 1 Starten!
@@ -156,8 +164,8 @@
          var tmpUser = new User(userId, userName, telegramId);
          arr.push(tmpUser);
      }
-     logger.LogString("Reading Whitelist file completed");
-     logger.LogString("" + arr.length + " on the whitelist");
+     log.info("Reading Whitelist file completed");
+     log.info("" + arr.length + " on the whitelist");
 
      return arr;
  }
@@ -181,38 +189,4 @@
      this.ToString = function() {
          return "User " + this.Name + " has the ID " + this.Id + " and the TelegramID " + this.TelegramId;
      }
- }
-
- function Logger() {
-     this.Writer = undefined;
-     this.Path = __dirname + "/log/";
-     this.FileSystem = require('fs');
-     this.FileName = undefined;
-     this.StartLogging = function() {
-         var today = actual_date(true);
-         this.Writer = this.FileSystem.createWriteStream(this.Path + this.GetLogFileName(), {
-             flags: 'a'
-         });
-         this.Writer.open();
-         this.Writer.write("--- START ---\r\n");
-     }
-     this.LogString = function(info) {
-         this.Writer.write("[DEBUG]:\t" + info + "\r\n");
-     }
-     this.LogError = function(err) {
-         this.Writer.write("\r\n[ERROR]:\t" + err + "\r\n");
-     }
-     this.StopLogging = function() {
-         this.Writer.write("--- END ---\r\n");
-         this.Writer.close();
-     }
-     this.GetLogFileName = function() {
-         if (this.FileName)
-             return this.FileName;
-
-         var date = new Date();
-         this.FileName = date.getDate() + "_" + date.getMonth() + "_" + date.getFullYear() + ".log";
-         return this.FileName;
-     }
- }
  }
