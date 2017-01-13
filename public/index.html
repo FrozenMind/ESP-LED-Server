@@ -2,7 +2,7 @@
 <html lang="de">
     <head>
         <meta charset="utf-8">
-        <title>Lichterkettensteuerung</title>
+        <title>ESP-LED-Server Controlcenter</title>
         <link rel="stylesheet" href="style/style.css">
         <script src="lib/jquery-3.1.1.min.js"></script>
         <script src="lib/socket.io.js"></script>
@@ -10,25 +10,22 @@
         <script src="client/client.js"></script>
     </head>
     <body>
-        <h2> Steuerung für die Lichterketten </h2>
+        <h2>To Control ESP</h2>
         <form>
-            1. Schritt:
             <div id="esp">
-                <b>Auswahl ESP</b> <br>
+                <b>Choose ESP</b> <br>
                 <select id="esps" name="esps" size="1" title="Auswahl ESP">
                     <option value="0">TestBoard</option>
                     <option value="1">Schreibtisch Vali</option>
                     <option value="2">Vitrine</option>
                 </select>
             </div>
-            2.Schritt:
             <div id="color">
-                <b>Farbe wählen</b> <br>
+                <b>Choose Color</b> <br>
                 <input id="colorInput" type="color" value="#000000" title="Farbe wählen">
             </div>
-            3.Schritt:
             <div id="mode">
-                <b>Optional Modus wählen </b><br>
+                <b>Choose Mode</b><br>
                 <select name="stripMode" size="1" title="Modus wählen" id="modes">
                     <option value="0">Color</option>
                     <option value="1">RandomBlink</option>
@@ -38,13 +35,9 @@
                     <option value="5">RainbowClassic</option>
                 </select>
             </div>
-            4.Schritt
             <div id="submit">
-                <b>Absenden</b><br>
+                <b>Submit</b><br>
                 <button type="button" id="go" title="Go">Go</button> <br>
-                <input type="checkbox" id="debugMode" title="Debug"> Debug<br>
-                <select id="debugUser" size="1" name="debug" hidden="true" title="An wen sollen die Debuginformationen gesendet werden?">
-                <!-- Optionen und Größe wird per jQuery ergänzt -->
             </select>
             </div>
         </form>
