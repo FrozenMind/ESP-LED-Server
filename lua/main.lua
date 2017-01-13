@@ -2,7 +2,16 @@ mode = nil
 color = nil
 
 timeout = 0
+trycounter = 0
 numberOfLeds = 16
+
+connected = false
+
+tmr_reconnect=tmr.create()
+tmr_reconnect:register(10000, tmr.ALARM_AUTO, function()
+   print("restart for reconnect")
+   node.restart()
+end)
 
 ws2812.init()
 
@@ -11,24 +20,23 @@ tmr.alarm(0, 1000, tmr.ALARM_AUTO, function()
     if wifi.sta.getip~=nil or timeout>6 then
         print("IP available")
         tmr.stop(0)
-        tmr.alarm(1, 1000, tmr.ALARM_SINGLE, function() main() end)
+        tmr.alarm(1, 1000, tmr.ALARM_SINGLE, function() main() end)        
     else
         dofile("ConnectToWLAN.lua")
         print("Tried to connect to wlan")
     end
 end)
 
-
-
 function main()
     socket = net.createConnection(net.TCP,0)
-    socket:connect(8124,"192.168.1.1")
+    trycounter = 0
+    cyrill()
     socket:on("receive", function(sck, c)
         print(c)
         processData(c)
         
         if mode == 0 then 
-            ColorOnly()
+            ColorOnly(color)
         elseif mode == 1 then
             dofile("RandomBlink.lua")
         elseif mode == 2 then
@@ -46,7 +54,30 @@ function main()
     end)
     socket:on("connection", function(sck, c)
         print("Connected")
+        connected = true
+        ColorOnly(string.char(0,0,0))
     end)
+    socket:on("disconnection", function(sck, c)
+        print("Disconnected")
+        dofile("KnighRider_ErrorMode.lua")
+        if connected then
+            tmr_reconnect:start()
+        end
+        connected = false
+    end)
+        
+end
+
+function cyrill()
+    print("check for connstatus: "..tostring(connected))
+    trycounter = trycounter + 1
+    if not connected and trycounter<=15 then
+        socket:connect(8124,"192.168.1.1")
+        tmr.alarm(6, 4000, tmr.ALARM_SINGLE, function() cyrill() end)
+    elseif trycounter>15 then
+        print("going to sleep")
+        node.dsleep()
+    end
 end
 
 function processData(data)
@@ -57,8 +88,8 @@ function processData(data)
     print(color)
 end
 
-function ColorOnly()
+function ColorOnly(col)
     tmr.alarm(0,200,tmr.ALARM_AUTO, function() 
-        ws2812.write(color:rep(numberOfLeds))
+        ws2812.write(col:rep(numberOfLeds))
     end)
 end
