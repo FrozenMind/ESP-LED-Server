@@ -6,10 +6,7 @@ var currentMode = undefined;
 
 $(document).ready(function() {
     socket = io();
-    //Events registrieren
-    $("#esps").change(espChanged);
-    $("#colorInput").change(colorChanged);
-    $("#modes").change(modeChanged);
+    //click event for submit button
     $("#go").click(submitData);
 });
 
@@ -18,8 +15,8 @@ function submitData(event) {
     if ((currentEsp !== undefined) && (currentColor !== undefined) || (currentMode !== undefined)) {
         return;
     }
-    var esp = new ESP(currentEsp, currentColor, currentMode);
     collectData();
+    var esp = new ESP(currentEsp, currentColor, currentMode);
     socket.emit("go", esp);
 }
 
@@ -32,12 +29,9 @@ function collectData() {
 
 //convert hex value into RGB Color
 function hexToRGBColor(hex) {
-    var r = parseInt(hex.substring(1, 3), 16);
-    var g = parseInt(hex.substring(3, 5), 16);
-    var b = parseInt(hex.substring(5, 7), 16);
     return {
-        R: r,
-        G: g,
-        B: b
+        R: parseInt(hex.substring(1, 3), 16),
+        G: parseInt(hex.substring(3, 5), 16),
+        B: parseInt(hex.substring(5, 7), 16)
     };
 }

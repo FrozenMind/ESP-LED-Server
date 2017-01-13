@@ -51,7 +51,11 @@
          //log ESP Mode to start
          log.info("ESP: " + e.Id + "\tColor: " + " R: " + e.R + " G: " + e.G + " B: " + e.B + "\tMode: " + e.Mode);
          //Send to ESP
-         clients[jsonData.Id].write(JSON.stringify(jsonData));
+         //only if esp is connected tell esp what to do
+         if (clients[jsonData.Id])
+             clients[jsonData.Id].write(JSON.stringify(jsonData));
+         else
+             log.error("ESP (ID: " + jsonData.Id + ") not connected");
      });
      //on socket error (i.e. socket disconnect without closing)
      sck.on('error', function(exc) {
@@ -87,7 +91,11 @@
          //log ESP Mode to start
          log.info("ESP: " + e.Id + "\tColor: " + " R: " + e.R + " G: " + e.G + " B: " + e.B + "\tMode: " + e.Mode);
          //Send to ESP
-         clients[e.Id].write(JSON.stringify(e));
+         //only if esp is connected tell esp what to do
+         if (clients[jsonData.Id])
+             clients[e.Id].write(JSON.stringify(e));
+         else
+             log.error("ESP (ID: " + e.Id + ") not connected");
      });
      //on socket disconnect (http)
      socket.on("disconnect", function(data) {
