@@ -1,13 +1,16 @@
 package com.example.frozenprince.espledserver;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText redEditText;
     private EditText greenEditText;
     private EditText blueEditText;
+    private TextView resultColorEditText;
     private Button submitButton;
 
     private int redColor = 0;
@@ -37,6 +41,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        try{
+            tcpChannel = new TCPChannel("192.168.0.220", 8124);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+
         espSpinner = (Spinner)findViewById(R.id.spinnerESP);
         modeSpinner = (Spinner)findViewById(R.id.spinnerMode);
         redSeekBar = (SeekBar)findViewById(R.id.seekBarRed);
@@ -46,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         greenEditText = (EditText)findViewById(R.id.editTextGreen);
         blueEditText = (EditText)findViewById(R.id.editTextBlue);
         submitButton = (Button)findViewById(R.id.button);
+        resultColorEditText = (TextView)findViewById(R.id.textViewResultColor);
 
         List<String> espList = new ArrayList<>();
         espList.add("Testboard");
@@ -87,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 redColor = i;
                 redEditText.setText("" + i);
+                //String hexCol = "#" + Integer.toHexString(redColor) + "" + Integer.toHexString(greenColor) + "" + Integer.toHexString(blueColor);
+                //resultColorEditText.setBackgroundColor(Color.parseColor(hexCol));
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -98,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 greenColor = i;
                 greenEditText.setText("" + i);
+                //String hexCol = "#" + Integer.toHexString(redColor) + "" + Integer.toHexString(greenColor) + "" + Integer.toHexString(blueColor);
+                //resultColorEditText.setBackgroundColor(Color.parseColor(hexCol));
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -109,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 blueColor = i;
                 blueEditText.setText("" + i);
+                //String hexCol = "#" + Integer.toHexString(redColor) + "" + Integer.toHexString(greenColor) + "" + Integer.toHexString(blueColor);
+                //resultColorEditText.setBackgroundColor(Color.parseColor(hexCol));
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -136,9 +154,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-
-
-                Constants.tcpChannel.write(espData.toString());
+                tcpChannel.write(espData.toString());
             }
         });
 

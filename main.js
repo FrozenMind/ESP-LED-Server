@@ -97,7 +97,7 @@
  function sendDataToEsp(jsonData) {
      log.debug(jsonData);
      //log ESP Mode to start
-     log.info("ESP: " + e.Id + "\tColor: " + " R: " + e.R + " G: " + e.G + " B: " + e.B + "\tMode: " + e.Mode);
+     log.info("ESP: " + jsonData.Id + "\tColor: " + " R: " + jsonData.R + " G: " + jsonData.G + " B: " + jsonData.B + "\tMode: " + jsonData.Mode);
      //Send to ESP
      //only if esp is connected tell esp what to do
      if (clients[jsonData.Id])
