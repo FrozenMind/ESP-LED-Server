@@ -38,16 +38,17 @@
  var clients = new Array();
 
  //TCP Server erzeugen!
- server = net.createServer(function(c) {
-     log.debug("Connected TCP");
-     clients.push(c);
+ server = net.createServer(function(sck) {
+     log.debug("Client connected");
+     log.debug(sck);
+     clients.push(sck);
      log.info("Client connected to TCP Server");
-     c.on("end", function() {
+     sck.on("end", function() {
          log.info("Client disconnected from TCP Server");
-         clients.slice(clients.indexOf(c), 1);
+         clients.slice(clients.indexOf(sck), 1);
      });
 
-     c.on('data', function(data) {
+     sck.on('data', function(data) {
          try {
              jsonData = JSON.parse(data);
          } catch (e) {
@@ -57,9 +58,9 @@
          clients[jsonData.Id].write(JSON.stringify(jsonData));
      });
 
-     c.on('error', function(exc) {
+     sck.on('error', function(exc) {
          log.error(exc);
-         clients.slice(clients.indexOf(c), 1);
+         clients.slice(clients.indexOf(sck), 1);
      })
  });
 
