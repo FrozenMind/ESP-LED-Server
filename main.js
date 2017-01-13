@@ -6,14 +6,6 @@
  var os = require('os');
  var net = require('net');
  var bunyan = require('bunyan');
- var server = undefined;
-
- //Telegram bot init
- var TelegramBot = require('node-telegram-bot-api');
- var token = '265274462:AAFtbuN6p80ywv0MJ1UJbS51SsZjM4fF854';
- var bot = new TelegramBot(token, {
-     polling: true
- });
 
  //Logger init
  var log = bunyan.createLogger({
@@ -49,6 +41,7 @@
      });
 
      sck.on('data', function(data) {
+         //data is an string so we convert it to json to use it in the actionMethod
          try {
              jsonData = JSON.parse(data);
          } catch (e) {
