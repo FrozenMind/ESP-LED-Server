@@ -45,6 +45,11 @@
          console.log(jsonData);
          clients[jsonData.Id].write(JSON.stringify(jsonData));
      });
+
+     c.on('error', function(exc) {
+         console.log(exc);
+         clients.slice(clients.indexOf(c), 1);
+     })
  });
 
  //TCP Server Fehler
@@ -280,4 +285,5 @@
          this.FileName = date.getDate() + "_" + date.getMonth() + "_" + date.getFullYear() + ".log";
          return this.FileName;
      }
+ }
  }
