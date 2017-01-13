@@ -7,6 +7,11 @@
  var net = require('net');
  var bunyan = require('bunyan');
 
+ //ESP Clients Array
+ var clients = new Array();
+ //ESP MACAdressen which will be excepted on connection
+ var clientMAC = [];
+
  //Logger init
  var log = bunyan.createLogger({
      name: 'ESPServerLogger',
@@ -22,24 +27,19 @@
      }]
  });
 
- //Users
- var debugUser = undefined;
- var users = undefined;
-
- //ESP Clients
- var clients = new Array();
-
  //TCP Server erzeugen!
  server = net.createServer(function(sck) {
      log.debug("Client connected");
      log.debug(sck);
+     //push socket into client array
      clients.push(sck);
      log.info("Client connected to TCP Server");
+     //on socket disconnect
      sck.on("end", function() {
          log.info("Client disconnected from TCP Server");
          clients.slice(clients.indexOf(sck), 1);
      });
-
+     //on data received
      sck.on('data', function(data) {
          //data is an string so we convert it to json to use it in the actionMethod
          try {
@@ -48,139 +48,53 @@
              log.debug("No JSON received");
          }
          log.debug(jsonData);
+         //log ESP Mode to start
+         log.info("ESP: " + e.Id + "\tColor: " + " R: " + e.R + " G: " + e.G + " B: " + e.B + "\tMode: " + e.Mode);
+         //Send to ESP
          clients[jsonData.Id].write(JSON.stringify(jsonData));
      });
-
+     //on socket error (i.e. socket disconnect without closing)
      sck.on('error', function(exc) {
          log.error(exc);
          clients.slice(clients.indexOf(sck), 1);
      })
+ }).listen(8124, function() {
+     log.info("TCP Server listening on Port 8124");
  });
 
- //TCP Server Fehler
+ //TCP Server Error
  server.on("error", function(err) {
      log.error(err);
  });
 
- //TCP Server starten
- server.listen(8124, function() {
-     log.info("TCP Server listening on Port 8124");
- });
-
- //HTTP Server starten
+ //start HTTP Server
  http.listen(62345, function() {
      log.info('HTTP Server listening on Port 62345');
  });
 
- //User mit HTTP Server verbunden --> Website liefern
+ //on User Connection to HTTP Server send Website
  app.get('/', function(req, res) {
      app.use(express.static('public'));
      res.sendFile(__dirname + '/public/index.html');
-
-     //whitelist einlesen
-     users = GetWhitelistUsers();
  });
 
- //Verbindung zwischen User und HTTP Server steht
+ //connection between server and website (http server)
  io.on('connection', function(socket) {
      log.info(socket.handshake.address + " connected.");
-     //bei connection whitelist an client senden
-     log.info("Sending Users to client");
-     socket.emit("whitelist", users);
-
-
-     //wenn ein befehl übermittelt wird
+     //on esp start command (button "go" on website)
      socket.on('go', function(e) {
-         log.info("Client command recieved");
-         //wenn debug an ist wird alles per telegram gesendet
-         if (e.DebugEnabled) {
-             debugUser = users[e.DebugId].TelegramId;
-             log.info("Debug Mode enabled by " + debugUser);
-             bot.sendMessage(debugUser, actual_date() + "\nESP: " + e.Id + "\nColor: " + " R: " + e.R + " G: " + e.G + " B: " + e.B + "\nMode: " + e.Mode);
-         }
-
-         //Log Befehl
+         log.info("Client command recieved via HTTP");
+         //log ESP Mode to start
          log.info("ESP: " + e.Id + "\tColor: " + " R: " + e.R + " G: " + e.G + " B: " + e.B + "\tMode: " + e.Mode);
-
          //Send to ESP
          clients[e.Id].write(JSON.stringify(e));
-
      });
-
-     socket.on('data', function(e) {
-         try {
-             jsonData = JSON.parse(data);
-         } catch (e) {
-             log.debug("No JSON received");
-         }
-         log.debug(jsonData);
-     });
-
-     //Verbindung zwischen User und HTTP Server getrennt
+     //on socket disconnect (http)
      socket.on("disconnect", function(data) {
          log.info("User disconnected from HTTP Server.");
      });
-
-     // Fehler bei der Verbindung
+     //on socket error (http)
      socket.on("error", function(err) {
          log.error(err);
      });
  });
-
- //-----------Hilfsfunktionen-------------------
- //Liest die Whitelist ein, wenn noch keine User initialisiert wurden.
- //Gibt ein Array mit den Usern zurück
- function GetWhitelistUsers() {
-     var arr = new Array();
-     var fs_wl = require("fs");
-
-     if (users !== undefined) {
-         log.info("Users already defined");
-         return users;
-     }
-
-     log.info("No Users defined, read in whitelist...");
-     var data = fs_wl.readFileSync('whitelist.csv', {
-         encoding: "utf8",
-         flag: "r"
-     })
-
-     if (data === "")
-         log.error(err);
-
-     var lines = data.split(/\r\n|\n/);
-     //Erste Zeile enthält lediglich Spezifikation der Daten -> Loop bei 1 Starten!
-     for (i = 1; i < lines.length; i++) {
-         var userdata = lines[i].split(",");
-         var userId = parseInt(userdata[0]);
-         var userName = userdata[1];
-         var telegramId = userdata[2];
-         var tmpUser = new User(userId, userName, telegramId);
-         arr.push(tmpUser);
-     }
-     log.info("Reading Whitelist file completed");
-     log.info("" + arr.length + " on the whitelist");
-
-     return arr;
- }
-
- //gibt die aktuelle Zeit zurück
- function actual_date() {
-     var time = new Date();
-     var dateString = time.getDate() + "." + (time.getMonth() + 1) + "." + time.getFullYear() +
-         " " + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds() + "---";
-
-     return dateString;
- }
-
- //------------Hilfsklassen -------------------
-
- function User(id, name, telegramId) {
-     this.Id = id;
-     this.Name = name;
-     this.TelegramId = telegramId;
-
-     this.ToString = function() {
-         return "User " + this.Name + " has the ID " + this.Id + " and the TelegramID " + this.TelegramId;
-     }
- }
