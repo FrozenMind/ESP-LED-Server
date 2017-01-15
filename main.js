@@ -10,7 +10,7 @@
  //ESP Clients Array
  var clients = new Array();
  //ESP MACAdressen which will be excepted on connection
- var clientMAC = ['5C:CF:7F:86:91:CA'];
+ var clientMAC = ['5C:CF:7F:86:91:CA']; //testboard,
 
  //Logger init
  var log = bunyan.createLogger({
@@ -31,8 +31,6 @@
  server = net.createServer(function(sck) {
      log.debug("Client connected");
      log.debug(sck);
-     //push socket into client array
-     clients.push(sck);
      log.info("Client connected to TCP Server");
      //on data received
      sck.on('data', function(data) {
@@ -42,8 +40,18 @@
          } catch (e) {
              log.debug("No JSON received");
          }
-         log.info("Client command recieved via TCP (Android)");
-         sendDataToEsp(jsonData);
+         //esp send mac address on connection to be added into esp array, else its an android device
+         if (data.mac != undefined) {
+             for (i = 0; i < clientMAC.length - 1; i++) {
+                 if (data.mac == clientMAC[i]) {
+                     clients.push(sck);
+                     return;
+                 }
+             }
+         } else {
+             log.info("Client command recieved via TCP (Android)");
+             sendDataToEsp(jsonData);
+         }
      });
      //on socket disconnect
      sck.on("end", function() {
