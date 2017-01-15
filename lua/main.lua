@@ -15,12 +15,12 @@ end)
 
 ws2812.init()
 
-tmr.alarm(0, 1000, tmr.ALARM_AUTO, function() 
+tmr.alarm(0, 1000, tmr.ALARM_AUTO, function()
     timeout = timeout + 1
     if wifi.sta.getip~=nil or timeout>6 then
         print("IP available")
         tmr.stop(0)
-        tmr.alarm(1, 1000, tmr.ALARM_SINGLE, function() main() end)        
+        tmr.alarm(1, 1000, tmr.ALARM_SINGLE, function() main() end)
     else
         dofile("ConnectToWLAN.lua")
         print("Tried to connect to wlan")
@@ -34,8 +34,8 @@ function main()
     socket:on("receive", function(sck, c)
         print(c)
         processData(c)
-        
-        if mode == 0 then 
+
+        if mode == 0 then
             ColorOnly(color)
         elseif mode == 1 then
             dofile("RandomBlink.lua")
@@ -47,15 +47,17 @@ function main()
             dofile("PingPongDouble.lua")
         elseif mode == 5 then
             dofile("RainbowClassic.lua")
-        else 
+        else
             print("No Mode Selected")
         end
-        
+
     end)
     socket:on("connection", function(sck, c)
         print("Connected")
         connected = true
-        ColorOnly(string.char(0,0,0))
+        -- on connection to server tell server my ip
+        sck:send(wifi.sta.getmac())
+        ColorOnly(string.char(255,0,0))
     end)
     socket:on("disconnection", function(sck, c)
         print("Disconnected")
@@ -65,7 +67,7 @@ function main()
         end
         connected = false
     end)
-        
+
 end
 
 function cyrill()
@@ -89,7 +91,7 @@ function processData(data)
 end
 
 function ColorOnly(col)
-    tmr.alarm(0,200,tmr.ALARM_AUTO, function() 
+    tmr.alarm(0,200,tmr.ALARM_AUTO, function()
         ws2812.write(col:rep(numberOfLeds))
     end)
 end
