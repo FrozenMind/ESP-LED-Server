@@ -6,11 +6,12 @@
  var os = require('os');
  var net = require('net');
  var bunyan = require('bunyan');
+ var fs = require('fs');
 
  //ESP Clients Array
  var clients = new Array();
  //ESP MACAdressen which will be excepted on connection
- var clientMAC = ['5C:CF:7F:86:91:CA']; //testboard,
+ var clientMAC = [];
 
  //Logger init
  var log = bunyan.createLogger({
@@ -43,7 +44,7 @@
          //esp send mac address on connection to be added into esp array, else its an android device
          if (data.mac != undefined) {
              for (i = 0; i < clientMAC.length - 1; i++) {
-                 if (data.mac == clientMAC[i]) {
+                 if (data.mac == clientMAC[i].mac) {
                      clients.push(sck);
                      return;
                  }
@@ -112,4 +113,24 @@
          clients[jsonData.Id].write(JSON.stringify(jsonData));
      else
          log.error("ESP (ID: " + jsonData.Id + ") not connected");
+ }
+ readMacWhitelist();
+
+ function readMacWhitelist() {
+     fs.readFile(__dirname + '/espwhitelist.csv', (err, data) => {
+         if (!err) {
+             spData = data.toString().split('\n');
+             for (i = 0; i < spData.length - 1; i++) {
+                 cD = spData[i].split(',');
+                 clientMAC.push({
+                     id: cD[0],
+                     name: cD[1],
+                     mac: cD[2]
+                 });
+             }
+             console.log(clientMAC);
+         } else {
+             log.error(err);
+         }
+     });
  }
