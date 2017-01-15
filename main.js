@@ -45,6 +45,9 @@
          if (data.mac != undefined) {
              for (i = 0; i < clientMAC.length - 1; i++) {
                  if (data.mac == clientMAC[i].mac) {
+                     sck.mac = clientMAC[i].mac;
+                     sck.espid = clientMAC[i].id;
+                     sck.name = clientMAC[i].name;
                      clients.push(sck);
                      return;
                  }
@@ -57,12 +60,22 @@
      //on socket disconnect
      sck.on("end", function() {
          log.info("Client disconnected from TCP Server");
-         clients.slice(clients.indexOf(sck), 1);
+         try {
+             if (sck.mac != undefined)
+                 clients.slice(clients.indexOf(sck), 1);
+         } catch (e) {
+             log.error(e);
+         }
      });
      //on socket error (i.e. socket disconnect without closing)
      sck.on('error', function(exc) {
          log.error(exc);
-         clients.slice(clients.indexOf(sck), 1);
+         try {
+             if (sck.mac != undefined)
+                 clients.slice(clients.indexOf(sck), 1);
+         } catch (e) {
+             log.error(e);
+         }
      });
  }).listen(8124, function() {
      log.info("TCP Server listening on Port 8124");
@@ -128,7 +141,6 @@
                      mac: cD[2]
                  });
              }
-             console.log(clientMAC);
          } else {
              log.error(err);
          }
