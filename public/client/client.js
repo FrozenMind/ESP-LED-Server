@@ -12,10 +12,9 @@ $(document).ready(function() {
 
 function submitData(event) {
     //check if values arent undefined this cant be possible but save is save
-    if ((currentEsp !== undefined) && (currentColor !== undefined) || (currentMode !== undefined)) {
-        return;
-    }
     collectData();
+    if ((currentEsp == undefined) && (currentColor == undefined) || (currentMode == undefined))
+        return;
     var esp = new ESP(currentEsp, currentColor, currentMode);
     socket.emit("go", esp);
 }
