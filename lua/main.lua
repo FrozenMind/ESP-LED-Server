@@ -5,7 +5,10 @@ timeout = 0
 trycounter = 0
 numberOfLeds = 16
 
+ctrl = 6 --qpio12 to turn led strip on and off
+gpio.mode(ctrl, gpio.OUTPUT)
 connected = false
+
 
 tmr_reconnect=tmr.create()
 tmr_reconnect:register(10000, tmr.ALARM_AUTO, function()
@@ -47,6 +50,10 @@ function main()
             dofile("PingPongDouble.lua")
         elseif mode == 5 then
             dofile("RainbowClassic.lua")
+        elseif mode == 100 then --on
+            gpio.write(CTRL, gpio.HIGH)
+        elseif mode == 101 then --off
+            gpio.write(CTRL, gpio.LOW)
         else
             print("No Mode Selected")
         end
