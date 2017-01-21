@@ -12,6 +12,7 @@
  var clients = new Array();
  //ESP MACAdressen which will be excepted on connection
  var clientMAC = [];
+ var jsonData;
 
  //Logger init
  var log = bunyan.createLogger({
