@@ -51,9 +51,11 @@ function main()
         elseif mode == 5 then
             dofile("RainbowClassic.lua")
         elseif mode == 100 then --on
-            gpio.write(CTRL, gpio.HIGH)
+            gpio.write(ctrl, gpio.HIGH)
+            print("led turned on")
         elseif mode == 101 then --off
-            gpio.write(CTRL, gpio.LOW)
+            gpio.write(ctrl, gpio.LOW)
+            print("led turned off")
         else
             print("No Mode Selected")
         end
@@ -63,7 +65,11 @@ function main()
         print("Connected")
         connected = true
         -- on connection to server tell server my ip
-        sck:send(wifi.sta.getmac())
+        macTable = {}
+        macTable["mac"] = wifi.sta.getmac()
+        jsonMac = cjson.encode(macTable)
+        print(jsonMac)
+        sck:send(jsonMac)
         ColorOnly(string.char(255,0,0))
     end)
     socket:on("disconnection", function(sck, c)

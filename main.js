@@ -32,7 +32,6 @@
  //TCP Server erzeugen!
  server = net.createServer(function(sck) {
      log.debug("Client connected");
-     log.debug(sck);
      log.info("Client connected to TCP Server");
      //on data received
      sck.on('data', function(data) {
@@ -50,6 +49,7 @@
                      sck.espid = clientMAC[i].id;
                      sck.name = clientMAC[i].name;
                      clients.push(sck);
+                     log.info("ESP connected.");
                      return;
                  }
              }
