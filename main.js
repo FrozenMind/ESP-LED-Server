@@ -16,7 +16,6 @@
  var clientMAC = [];
  //read ESP Mac Adress Whitelist from File
  readMacWhitelist();
-
  //Logger init
  var log = bunyan.createLogger({
      name: 'ESPServerLogger',
@@ -43,6 +42,7 @@
          } catch (e) {
              log.debug("No JSON received");
          }
+         log.info(jsonData);
          //esp send mac address on connection to be added into esp array, else its an android device
          if (jsonData.mac != undefined) {
              for (i = 0; i < clientMAC.length - 1; i++) {
