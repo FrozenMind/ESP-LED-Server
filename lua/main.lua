@@ -38,6 +38,7 @@ function main()
         print(c)
         processData(c)
 
+        gpio.write(ctrl, gpio.HIGH)
         if mode == 0 then
             ColorOnly(color)
         elseif mode == 1 then
@@ -49,11 +50,8 @@ function main()
         elseif mode == 4 then
             dofile("PingPongDouble.lua")
         elseif mode == 5 then
-            dofile("RainbowClassic.lua")
-        elseif mode == 100 then --on
-            gpio.write(ctrl, gpio.HIGH)
-            print("led turned on")
-        elseif mode == 101 then --off
+            dofile("RainbowClassic.lua")        
+        elseif mode == 100 then --off
             gpio.write(ctrl, gpio.LOW)
             print("led turned off")
         else
@@ -68,7 +66,7 @@ function main()
         macTable = {}
         macTable["mac"] = wifi.sta.getmac()
         jsonMac = cjson.encode(macTable)
-        print(jsonMac)
+        print(jsonMac)  
         sck:send(jsonMac)
         ColorOnly(string.char(255,0,0))
     end)
