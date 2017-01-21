@@ -10,9 +10,12 @@
 
  //ESP Clients Array
  var clients = new Array();
+ var jsonData;
+
  //ESP MACAdressen which will be excepted on connection
  var clientMAC = [];
- var jsonData;
+ //read ESP Mac Adress Whitelist from File
+ readMacWhitelist();
 
  //Logger init
  var log = bunyan.createLogger({
@@ -31,7 +34,6 @@
 
  //TCP Server erzeugen!
  server = net.createServer(function(sck) {
-     log.debug("Client connected");
      log.info("Client connected to TCP Server");
      //on data received
      sck.on('data', function(data) {
@@ -42,9 +44,9 @@
              log.debug("No JSON received");
          }
          //esp send mac address on connection to be added into esp array, else its an android device
-         if (data.mac != undefined) {
+         if (jsonData.mac != undefined) {
              for (i = 0; i < clientMAC.length - 1; i++) {
-                 if (data.mac == clientMAC[i].mac) {
+                 if (jsonData.mac == clientMAC[i].mac) {
                      sck.mac = clientMAC[i].mac;
                      sck.espid = clientMAC[i].id;
                      sck.name = clientMAC[i].name;
@@ -130,7 +132,6 @@
      else
          log.error("ESP (ID: " + jsonData.Id + ") not connected");
  }
- readMacWhitelist();
 
  function readMacWhitelist() {
      fs.readFile(__dirname + '/espwhitelist.csv', (err, data) => {
