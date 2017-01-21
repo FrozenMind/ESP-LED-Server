@@ -54,7 +54,9 @@
              }
          } else {
              log.info("Client command recieved via TCP (Android)");
-             sendDataToEsp(jsonData);
+             if (jsonData != undefined) {
+                 sendDataToEsp(jsonData);
+             }
          }
      });
      //on socket disconnect
@@ -145,4 +147,5 @@
              log.error(err);
          }
      });
+ }
  }
