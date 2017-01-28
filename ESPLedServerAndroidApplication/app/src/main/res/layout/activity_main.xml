@@ -12,6 +12,7 @@
 
     <LinearLayout
         android:orientation="vertical"
+        android:paddingTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
@@ -24,12 +25,17 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
+            android:paddingRight="30dp"
+            android:paddingLeft="30dp"
             android:id="@+id/textView"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingRight="30dp"
+            android:paddingLeft="30dp"
+            android:layout_marginBottom="30dp"
             android:id="@+id/spinnerESP"
             android:layout_below="@+id/textView"
             android:layout_alignParentStart="true" />
@@ -40,76 +46,90 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
+            android:paddingRight="30dp"
+            android:paddingLeft="30dp"
             android:id="@+id/textView2"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingRight="30dp"
+            android:paddingLeft="30dp"
             android:id="@+id/spinnerMode"
             android:layout_below="@+id/textView"
             android:layout_alignParentStart="true" />
 
-        <SeekBar
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingTop="50dp"
+            android:paddingRight="30dp"
+            android:paddingLeft="30dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent">
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/seekBarRed"
+                android:background="@android:color/holo_red_dark" />
 
-            android:id="@+id/seekBarRed"
-            android:background="@android:color/holo_red_dark" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/editTextRed"
+                android:background="@android:color/holo_red_dark" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/editTextRed"
-            android:background="@android:color/holo_red_dark" />
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/seekBarGreen"
+                android:background="@android:color/holo_green_light" />
 
-        <SeekBar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/seekBarGreen"
-            android:background="@android:color/holo_green_light" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/editTextGreen"
+                android:background="@android:color/holo_green_light" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/editTextGreen"
-            android:background="@android:color/holo_green_light" />
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/seekBarBlue"
+                android:background="@android:color/holo_blue_dark" />
 
-        <SeekBar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/seekBarBlue"
-            android:background="@android:color/holo_blue_dark" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/editTextBlue"
+                android:background="@android:color/holo_blue_dark" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/editTextBlue"
-            android:background="@android:color/holo_blue_dark" />
+            <TextView
+                android:text="Result Color"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:id="@+id/textViewResultColor"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:layout_weight="0.12"
+                android:textAlignment="center"
+                android:layout_marginTop="15px" />
 
-        <TextView
-            android:text="Result Color"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:id="@+id/textViewResultColor"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:layout_weight="0.12"
-            android:textAlignment="center"
-            android:layout_marginTop="15px" />
+            <Button
+                android:text="Submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/button" />
 
-        <Button
-            android:text="Submit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/button" />
+        </LinearLayout>
 
     </LinearLayout>
 </RelativeLayout>

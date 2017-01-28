@@ -3,14 +3,15 @@ package com.example.frozenprince.espledserver;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,9 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar redSeekBar;
     private SeekBar greenSeekBar;
     private SeekBar blueSeekBar;
-    private EditText redEditText;
-    private EditText greenEditText;
-    private EditText blueEditText;
+    private TextView redEditText;
+    private TextView greenEditText;
+    private TextView blueEditText;
     private TextView resultColorEditText;
     private Button submitButton;
 
@@ -41,21 +42,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        try{
-            tcpChannel = new TCPChannel("192.168.0.220", 8124);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-
+        startConnectionWithServer();
 
         espSpinner = (Spinner)findViewById(R.id.spinnerESP);
         modeSpinner = (Spinner)findViewById(R.id.spinnerMode);
         redSeekBar = (SeekBar)findViewById(R.id.seekBarRed);
         greenSeekBar = (SeekBar)findViewById(R.id.seekBarGreen);
         blueSeekBar = (SeekBar)findViewById(R.id.seekBarBlue);
-        redEditText = (EditText)findViewById(R.id.editTextRed);
-        greenEditText = (EditText)findViewById(R.id.editTextGreen);
-        blueEditText = (EditText)findViewById(R.id.editTextBlue);
+        redEditText = (TextView)findViewById(R.id.editTextRed);
+        greenEditText = (TextView)findViewById(R.id.editTextGreen);
+        blueEditText = (TextView)findViewById(R.id.editTextBlue);
         submitButton = (Button)findViewById(R.id.button);
         resultColorEditText = (TextView)findViewById(R.id.textViewResultColor);
 
@@ -99,8 +95,10 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 redColor = i;
                 redEditText.setText("" + i);
-                //String hexCol = "#" + Integer.toHexString(redColor) + "" + Integer.toHexString(greenColor) + "" + Integer.toHexString(blueColor);
-                //resultColorEditText.setBackgroundColor(Color.parseColor(hexCol));
+
+                String hexaDecimalColor = RGBToHexaDecimal(redColor, greenColor, blueColor);
+                resultColorEditText.setText(hexaDecimalColor);
+                resultColorEditText.setBackgroundColor(Color.parseColor(hexaDecimalColor));
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -112,8 +110,9 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 greenColor = i;
                 greenEditText.setText("" + i);
-                //String hexCol = "#" + Integer.toHexString(redColor) + "" + Integer.toHexString(greenColor) + "" + Integer.toHexString(blueColor);
-                //resultColorEditText.setBackgroundColor(Color.parseColor(hexCol));
+                String hexaDecimalColor = RGBToHexaDecimal(redColor, greenColor, blueColor);
+                resultColorEditText.setText(hexaDecimalColor);
+                resultColorEditText.setBackgroundColor(Color.parseColor(hexaDecimalColor));
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -125,8 +124,9 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 blueColor = i;
                 blueEditText.setText("" + i);
-                //String hexCol = "#" + Integer.toHexString(redColor) + "" + Integer.toHexString(greenColor) + "" + Integer.toHexString(blueColor);
-                //resultColorEditText.setBackgroundColor(Color.parseColor(hexCol));
+                String hexaDecimalColor = RGBToHexaDecimal(redColor, greenColor, blueColor);
+                resultColorEditText.setText(hexaDecimalColor);
+                resultColorEditText.setBackgroundColor(Color.parseColor(hexaDecimalColor));
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -159,4 +159,57 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return(super.onCreateOptionsMenu(menu));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId())
+        {
+            case R.id.action_tcp_reconnect:
+                Toast.makeText(this, "Reconnect started", Toast.LENGTH_LONG).show();
+                startConnectionWithServer();
+                break;
+            case R.id.action_tcp_status:
+                if(tcpChannel == null)
+                {
+                    Toast.makeText(this, "Not Connected", Toast.LENGTH_LONG).show();
+                }
+                else if(tcpChannel.isConnectedToServer())
+                {
+                    Toast.makeText(this, "Connected", Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void startConnectionWithServer()
+    {
+        if(tcpChannel == null)
+        {
+            tcpChannel = new TCPChannel("192.168.0.220", 8124);
+        }
+        else
+        {
+            Toast.makeText(this, "Already connected to server", Toast.LENGTH_LONG).show();
+        }
+
+        if(!tcpChannel.isConnectedToServer())
+        {
+            Toast.makeText(this, "Could not connect to server", Toast.LENGTH_LONG).show();
+            tcpChannel = null;
+        }
+    }
+
+    private String RGBToHexaDecimal(final int iRedValue, final int iGreenValue, final int iBlueValue)
+    {
+        return String.format("#%02x%02x%02x", iRedValue, iGreenValue, iBlueValue);
+    }
+
 }

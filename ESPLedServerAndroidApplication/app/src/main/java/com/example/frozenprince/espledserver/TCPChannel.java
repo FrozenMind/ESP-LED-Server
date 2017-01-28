@@ -37,6 +37,7 @@ public final class TCPChannel extends Thread {
     public void run() {
         try {
             this.socket = new Socket(this.ip,this.port);
+
             new MessageNotifierThread().start();
             this.writer = new PrintWriter(socket.getOutputStream());
             try {
@@ -55,7 +56,7 @@ public final class TCPChannel extends Thread {
         } finally {
             try {
                 socket.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -96,5 +97,14 @@ public final class TCPChannel extends Thread {
                 }
             }
         }
+    }
+
+    public boolean isConnectedToServer()
+    {
+        if(socket != null)
+        {
+            return socket.isConnected();
+        }
+        return false;
     }
 }
