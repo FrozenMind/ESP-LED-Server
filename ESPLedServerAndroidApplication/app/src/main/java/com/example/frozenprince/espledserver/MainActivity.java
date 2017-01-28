@@ -1,5 +1,6 @@
 package com.example.frozenprince.espledserver;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private int redColor = 0;
     private int greenColor = 0;
     private int blueColor = 0;
+    private Context that;
 
     private TCPChannel tcpChannel;
     @Override
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         startConnectionWithServer();
+        that = this;
 
         espSpinner = (Spinner)findViewById(R.id.spinnerESP);
         modeSpinner = (Spinner)findViewById(R.id.spinnerMode);
@@ -153,11 +156,12 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-                tcpChannel.write(espData.toString());
+                if(tcpChannel!= null)
+                    tcpChannel.write(espData.toString());
+                else
+                    Toast.makeText(that, "Client Not Connected", Toast.LENGTH_LONG).show();
             }
         });
-
     }
 
     @Override

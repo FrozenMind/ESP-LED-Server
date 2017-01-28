@@ -4,12 +4,14 @@
   "description": "LED Steuerung für unsere Wohnung",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ESPLedServerDesktopApplication.js"
   },
   "author": "Valentin und Christian",
   "license": "ISC",
   "dependencies": {
     "bunyan": "^1.8.5",
+    "electron": "^1.4.15",
     "express": "^4.14.0",
     "fs": "0.0.1-security",
     "http": "0.0.0",
@@ -18,5 +20,8 @@
     "os": "^0.1.1",
     "socket.io": "^1.5.0",
     "telegram-bot-api": "^1.2.0"
+  },
+  "devDependencies": {
+    "electron-prebuilt": "^1.4.13"
   }
 }
