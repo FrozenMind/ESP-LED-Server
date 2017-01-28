@@ -89,6 +89,7 @@ function cyrill()
         tmr.alarm(6, 4000, tmr.ALARM_SINGLE, function() cyrill() end)
     elseif trycounter>15 then
         print("going to sleep")
+        ColorOnly(string.char(0,0,0))
         node.dsleep()
     end
 end
