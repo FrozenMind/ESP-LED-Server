@@ -14,4 +14,9 @@
         android:title="Connection Status"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_speech"
+        android:title="Speech Input"
+        app:showAsAction="never" />
+
 </menu>

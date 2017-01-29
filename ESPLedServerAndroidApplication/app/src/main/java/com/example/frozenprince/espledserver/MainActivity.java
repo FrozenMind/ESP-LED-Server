@@ -1,7 +1,10 @@
 package com.example.frozenprince.espledserver;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,6 +22,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -189,6 +193,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "Connected", Toast.LENGTH_LONG).show();
                 }
                 break;
+            case R.id.action_speech:
+                promptSpeechInput();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -216,4 +223,43 @@ public class MainActivity extends AppCompatActivity {
         return String.format("#%02x%02x%02x", iRedValue, iGreenValue, iBlueValue);
     }
 
+    /**
+     * Showing google speech input dialog
+     * */
+    private final int REQ_CODE_SPEECH_INPUT = 100;
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                getString(R.string.speech_prompt));
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(), getString(R.string.speech_not_supported), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Receiving speech input
+     * */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                if (resultCode == RESULT_OK && null != data) {
+
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    Toast.makeText(getApplicationContext(), result.get(0), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            }
+
+        }
+    }
+
 }
+
