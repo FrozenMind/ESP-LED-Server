@@ -50,7 +50,7 @@
                      sck.mac = clientMAC[i].mac;
                      sck.espid = clientMAC[i].id;
                      sck.name = clientMAC[i].name;
-                     clients.push(sck);
+                     clients[i] = sck;
                      log.info("ESP connected.");
                      return;
                  }
