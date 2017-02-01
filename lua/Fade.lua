@@ -1,11 +1,6 @@
 NumberOfLeds = 16 -- LED Anzahl
 RainbowTime = 60
-step = -1
-intColor = -1
 counter = 1
-r = 0
-g = 0
-b = 0
 
 ws2812.init()
 
