@@ -1,50 +1,40 @@
-function GetArraySize(arr)
-    local count = 0
-    for i,v in ipairs(arr) do 
-        count = count + 1
-    end
-    return count
-end
-
--- Rainbow Colors
-Red = string.char(0,255,0)
-Orange = string.char(127,255,0)
-Yellow = string.char(255,255,0)
-Green = string.char(255,0,0)
-Blue = string.char(0,0,255)
-Indigo = string.char(0,75,130)
-Violet = string.char(0,127,255)
-
-RainbowColors = {Red,Orange,Yellow,Green,Blue,Indigo,Violet} -- Array mit allen Farben
-RainbowColorsSize = GetArraySize(RainbowColors) -- Array Größez
 NumberOfLeds = 16 -- LED Anzahl
 
 ws2812.init()
 buffer = ws2812.newBuffer(NumberOfLeds,3) -- Buffer
 
--- Errechnen wie viele LEDs die jeweilige Farbe bekommt
-ColorAmount = math.floor(NumberOfLeds / RainbowColorsSize)
-ColorMod = NumberOfLeds % RainbowColorsSize
+tmr.alarm(0,1000,tmr.ALARM_AUTO,function()
+    for j=0,256,1 do
+        print("outer for")
+        for i=1, NumberOfLeds, 1 do
+            print("inner for")
+            --color = Wheel(bit.band((i+j),255))
+            x = (i * 256 / NumberOfLeds) + j
+            color = Wheel(bit.band(x,255))
+            buffer:set(i, color);
+        
+       
+        end
+        -- Rainbow Effekt anzeigen
+        print("Write LEDs")
+        ws2812.write(buffer)
+        buffer:shift(1,ws2812.SHIFT_CIRCULAR)
+    end
+end)
 
--- Speichern der Anzahl
---ColorAmountTable = {}
---for i = 0, RainbowColorsSize, 1 do 
-	--ColorAmountTable[RainbowColors[i]] = ColorAmount
---end
 
---if ColorMod > 0
-	--for j = 0, ColorMod, 1 do
-		--ColorAmount[RainbowColors[j]] = ColorAmount[RainbowColors[j]] + 1
-	--end
---end
-
--- Füllen des Buffers
-
-for k = 0, NumberOfLeds-1, 1 do
-    buffer:set(k+1, RainbowColors[(k%RainbowColorsSize)+1])
+-- Input a value 0 to 255 to get a color value.
+-- The colours are a transition r - g - b - back to r.
+function Wheel(WheelPos)
+    print(WheelPos)
+    WheelPos = 255 - WheelPos;
+    if WheelPos < 85 then
+        return string.char(255 - WheelPos * 3, 0, WheelPos * 3);
+    end
+    if WheelPos < 170 then
+        WheelPos = WheelPos - 85;
+        return string.char(0, WheelPos * 3, 255 - WheelPos * 3);
+    end
+    WheelPos = WheelPos - 170;
+    return string.char(WheelPos * 3, 255 - WheelPos * 3, 0);
 end
-
--- Rainbow Effekt anzeigen
-ws2812.write(buffer)
-
-
