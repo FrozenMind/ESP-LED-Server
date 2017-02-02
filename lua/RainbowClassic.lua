@@ -1,40 +1,45 @@
 NumberOfLeds = 16 -- LED Anzahl
+RainbowTime = 765
+buffer = ws2812.newBuffer(NumberOfLeds,3)
+leds = {}
 
 ws2812.init()
-buffer = ws2812.newBuffer(NumberOfLeds,3) -- Buffer
 
-tmr.alarm(0,1000,tmr.ALARM_AUTO,function()
-    for j=0,256,1 do
-        print("outer for")
-        for i=1, NumberOfLeds, 1 do
-            print("inner for")
-            --color = Wheel(bit.band((i+j),255))
-            x = (i * 256 / NumberOfLeds) + j
-            color = Wheel(bit.band(x,255))
-            buffer:set(i, color);
-        
-       
-        end
-        -- Rainbow Effekt anzeigen
-        print("Write LEDs")
-        ws2812.write(buffer)
-        buffer:shift(1,ws2812.SHIFT_CIRCULAR)
+function init()
+    step = 765 / NumberOfLeds
+    for i=1,NumberOfLeds,1 do
+        leds[i] = step * i
+        buffer:set(i,GetRainbowColor(leds[i]))
     end
-end)
-
-
--- Input a value 0 to 255 to get a color value.
--- The colours are a transition r - g - b - back to r.
-function Wheel(WheelPos)
-    print(WheelPos)
-    WheelPos = 255 - WheelPos;
-    if WheelPos < 85 then
-        return string.char(255 - WheelPos * 3, 0, WheelPos * 3);
-    end
-    if WheelPos < 170 then
-        WheelPos = WheelPos - 85;
-        return string.char(0, WheelPos * 3, 255 - WheelPos * 3);
-    end
-    WheelPos = WheelPos - 170;
-    return string.char(WheelPos * 3, 255 - WheelPos * 3, 0);
 end
+
+function GetRainbowColor(intColor)
+    if intColor <= (RainbowTime / 3) then
+        r = 255 - (intColor)
+        g = intColor
+        b = 0
+    elseif intColor <= (RainbowTime * (2/3)) then
+        r = 0
+        g = 510 - (intColor)
+        b = (intColor) - 255
+    else
+        r = (intColor) - 510
+        g = 0
+        b = 765 - (intColor)
+    end
+    return string.char(math.floor(g),math.floor(r),math.floor(b))
+end
+
+init()
+ws2812.write(buffer)
+tmr.alarm(0,100,tmr.ALARM_AUTO, function()
+    print(tmr.now())
+    for i=1,NumberOfLeds,1 do
+        leds[i] = leds[i] + 1
+        if leds[i] >= 764 then
+           leds[i] = 1 
+        end
+        buffer:set(i,GetRainbowColor(leds[i]))
+    end
+    print(tmr.now())
+end)
