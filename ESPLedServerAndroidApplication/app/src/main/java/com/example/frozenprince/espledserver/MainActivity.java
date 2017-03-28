@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if(tcpChannel!= null)
+                if(tcpChannel != null)
                     tcpChannel.write(espData.toString());
                 else
                     Toast.makeText(that, "Client Not Connected", Toast.LENGTH_LONG).show();
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         {
             Toast.makeText(this, "Already connected to server", Toast.LENGTH_LONG).show();
         }
-
+        //TODO: wait 1 second, so socket has time to connect
         if(!tcpChannel.isConnectedToServer())
         {
             Toast.makeText(this, "Could not connect to server", Toast.LENGTH_LONG).show();

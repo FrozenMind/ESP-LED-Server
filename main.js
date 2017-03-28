@@ -38,6 +38,7 @@
      sck.on('data', function(data) {
          //data is an string so we convert it to json to use it in the actionMethod
          try {
+             jsonData = undefined;
              jsonData = JSON.parse(data);
          } catch (e) {
              log.debug("No JSON received");
@@ -66,8 +67,11 @@
      sck.on("end", function() {
          log.info("Client disconnected from TCP Server");
          try {
-             if (sck.mac != undefined)
-                 clients.slice(clients.indexOf(sck), 1);
+             if (sck.mac != undefined) {
+                 clients[clients.indexOf(sck)] = undefined;
+             } else {
+                 log.debug("Android Device disconnected.")
+             }
          } catch (e) {
              log.error(e);
          }
@@ -76,8 +80,11 @@
      sck.on('error', function(exc) {
          log.error(exc);
          try {
-             if (sck.mac != undefined)
-                 clients.slice(clients.indexOf(sck), 1);
+             if (sck.mac != undefined) {
+                 clients[clients.indexOf(sck)] = undefined;
+             } else {
+                 log.debug("Android Device disconnected.")
+             }
          } catch (e) {
              log.error(e);
          }
