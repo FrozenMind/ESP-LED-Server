@@ -1,6 +1,9 @@
 package com.example.frozenprince.espledserver;
 
 
+import android.content.Context;
+import android.widget.Toast;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,11 +25,12 @@ public final class TCPChannel extends Thread {
     private PrintWriter writer;
     private BufferedReader reader;
     private final List<MessageListener> msgListeners;
+    private Context mainContext;
 
-    public TCPChannel(String ip, int port) {
-
+    public TCPChannel(String ip, int port, Context mainContext) {
         this.ip = ip;
         this.port = port;
+        this.mainContext = mainContext;
         this.msgListeners = new ArrayList<>();
         this.outputBufferQueue = new ArrayBlockingQueue<String>(10);
         super.start();
@@ -37,7 +41,7 @@ public final class TCPChannel extends Thread {
     public void run() {
         try {
             this.socket = new Socket(this.ip,this.port);
-
+            Toast.makeText(this.mainContext, "Connected to Server", Toast.LENGTH_LONG).show();
             new MessageNotifierThread().start();
             this.writer = new PrintWriter(socket.getOutputStream());
             try {
@@ -47,12 +51,14 @@ public final class TCPChannel extends Thread {
                     writer.flush();
                 }
             } catch (InterruptedException e) {
+                Toast.makeText(this.mainContext, "Failes to write message", Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             } finally {
                 writer.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(this.mainContext, "Could not create Socket or Streams", Toast.LENGTH_LONG).show();
         } finally {
             try {
                 socket.close();

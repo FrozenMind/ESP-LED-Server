@@ -197,18 +197,23 @@ public class MainActivity extends AppCompatActivity {
     {
         if(tcpChannel == null)
         {
-            tcpChannel = new TCPChannel("192.168.0.220", 8124);
+            try{
+                tcpChannel = new TCPChannel("192.168.0.220", 8124, that);
+            }catch(Exception e){
+                Toast.makeText(this, "Connect to Server failed.", Toast.LENGTH_LONG).show();
+            }
+
         }
         else
         {
             Toast.makeText(this, "Already connected to server", Toast.LENGTH_LONG).show();
         }
         //TODO: wait 1 second, so socket has time to connect
-        if(!tcpChannel.isConnectedToServer())
-        {
-            Toast.makeText(this, "Could not connect to server", Toast.LENGTH_LONG).show();
-            tcpChannel = null;
-        }
+        //if(!tcpChannel.isConnectedToServer())
+        //{
+            //Toast.makeText(this, "Could not connect to server", Toast.LENGTH_LONG).show();
+            //tcpChannel = null;
+        //}
     }
 
     private String RGBToHexaDecimal(final int iRedValue, final int iGreenValue, final int iBlueValue)
